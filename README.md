@@ -9,10 +9,10 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/useripx/MrClean-byArio"><img src="https://img.shields.io/github/repo-size/useripx/MrClean-byArio?style=for-the-badge&logo=github&color=0284c7" alt="Repo Size"/></a>
-  <a href="https://github.com/useripx/MrClean-byArio/network/members"><img src="https://img.shields.io/github/forks/useripx/MrClean-byArio?style=for-the-badge&logo=git&color=10b981" alt="Forks"/></a>
-  <a href="https://github.com/useripx/MrClean-byArio/stargazers"><img src="https://img.shields.io/github/stars/useripx/MrClean-byArio?style=for-the-badge&logo=star&color=f59e0b" alt="Stars"/></a>
-  <a href="https://github.com/useripx/MrClean-byArio/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-purple?style=for-the-badge" alt="License"/></a>
+  <a href="https://github.com/useripx/MCleanPro"><img src="https://img.shields.io/github/repo-size/useripx/MCleanPro?style=for-the-badge&logo=github&color=0284c7" alt="Repo Size"/></a>
+  <a href="https://github.com/useripx/MCleanPro/network/members"><img src="https://img.shields.io/github/forks/useripx/MCleanPro?style=for-the-badge&logo=git&color=10b981" alt="Forks"/></a>
+  <a href="https://github.com/useripx/MCleanPro/stargazers"><img src="https://img.shields.io/github/stars/useripx/MCleanPro?style=for-the-badge&logo=star&color=f59e0b" alt="Stars"/></a>
+  <a href="https://github.com/useripx/MCleanPro/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-purple?style=for-the-badge" alt="License"/></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.13-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/></a>
   <a href="#"><img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Platform"/></a>
   <a href="#"><img src="https://img.shields.io/badge/Network-100%25%20Offline-success?style=for-the-badge&logo=airplayvideo" alt="Offline"/></a>
@@ -31,7 +31,7 @@ Aplikasi ini beroperasi **100% secara offline di memori lokal komputer**, menjam
 
 ## ✨ Fitur Unggulan (Core Capabilities)
 
-### 1. 🛡️ 100% Offline & Aman (Zero Data Leakage)
+### 1. 🛡 100% Offline & Aman (Zero Data Leakage)
 Tidak memerlukan koneksi internet atau registrasi akun. Berkas Anda tetap berada di perangkat lokal Anda setiap saat.
 
 ### 2. 🔍 Inspeksi Metadata Komprehensif
@@ -46,7 +46,7 @@ Mengadopsi dan menyempurnakan algoritma deteksi steganografi modern:
 - **Invisible Unicode Watermarks:** Menghapus karakter tak terlihat seperti *Zero-Width Spaces* (`\u200B`), *Zero-Width Joiners* (`\u200D`), *Non-Breaking Spaces*, dan *Variation Selector-16* (`\uFE0F`) tanpa merusak kata atau teks asli.
 - **C2PA Content Credentials Manifests:** Membersihkan manifes metadata C2PA pada media sintetis.
 
-### 4. ✏️ Editor Metadata Selektif / Granular (Preservative Editor) *(Baru di v2.0)*
+### 4. ✏ Editor Metadata Selektif / Granular (Preservative Editor) *(Baru di v2.0)*
 Ingin mengganti nama pembuat dokumen tanpa merusak format aslinya? Fitur ini memungkinkan Anda menyunting field tertentu saja:
 - **Contoh Kasus:** Mengubah field **Author** menjadi *"Yogi Ario"* pada dokumen PDF atau gambar JPEG, sementara nilai teknis kamera, tanggal asli, dimensi, dan resolusi **dipertahankan 100% utuh tanpa berubah**.
 - Pilihan mode penyimpanan: **Langsung di Tempat (*In-Place*)** atau **Simpan sebagai Salinan Baru**.
@@ -54,7 +54,7 @@ Ingin mengganti nama pembuat dokumen tanpa merusak format aslinya? Fitur ini mem
 ### 5. 💾 Ekspor Laporan Hasil Analisis (Radio Button) *(Baru di v2.0)*
 Menyediakan jendela dialog pilihan format ekspor laporan:
 - **Dokumen PDF (.pdf):** Laporan cetak formal berstandar profesional lengkap dengan kop logo resmi, ringkasan statistik, dan kartu rincian properti per berkas.
-- **Berkas Markdown (.md):** Laporan tabel terstruktur GitHub-flavored Markdown lengkap dengan badge status visual (`✅ Bersih`, `⚠️ Metadata`, `🤖 AI-WM`).
+- **Berkas Markdown (.md):** Laporan tabel terstruktur GitHub-flavored Markdown lengkap dengan badge status visual (`✅ Bersih`, `⚠ Metadata`, `🤖 AI-WM`).
 
 ### 6. ⚡ Pemindaian & Pembersihan Massal (Batch Processing)
 - Tombol **"Pindai 1 Folder..."** untuk memeriksa ratusan berkas dalam satu kali klik.
@@ -78,7 +78,7 @@ Bagi pengguna akhir, Anda tidak perlu menginstal Python. Cukup unduh dan jalanka
 
 ---
 
-## 🛠️ Instalasi & Menjalankan dari Kode Sumber (Developer)
+## 🛠 Instalasi & Menjalankan dari Kode Sumber (Developer)
 
 ### Prasyarat
 - **Sistem Operasi:** Windows 10 / 11
@@ -88,8 +88,8 @@ Bagi pengguna akhir, Anda tidak perlu menginstal Python. Cukup unduh dan jalanka
 ### Langkah Pemasangan:
 ```bash
 # 1. Clone repositori ini
-git clone https://github.com/useripx/MrClean-byArio.git
-cd MrClean-byArio
+git clone https://github.com/useripx/MCleanPro.git
+cd MCleanPro
 
 # 2. Buat virtual environment (opsional namun disarankan)
 python -m venv venv
@@ -137,7 +137,7 @@ Hasil kompilasi otomatis tersedia di:
 ## 📁 Struktur Direktori Repositori
 
 ```text
-MrClean-byArio/
+MCleanPro/
 ├── .gitignore                     # Perlindungan keamanan & eksklusi berkas sementara
 ├── .env.example                   # Template konfigurasi standar
 ├── README.md                      # Dokumentasi utama proyek
@@ -189,7 +189,7 @@ MrClean-byArio/
 Proyek ini dikembangkan dan dikelola oleh:
 * **Yogi Ario** — *Lead Developer & Project Owner*
 * GitHub: [@useripx](https://github.com/useripx)
-* Repositori Resmi: [MrClean-byArio](https://github.com/useripx/MrClean-byArio)
+* Repositori Resmi: [MCleanPro](https://github.com/useripx/MCleanPro)
 
 ---
 
