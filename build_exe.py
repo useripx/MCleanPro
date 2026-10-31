@@ -1,20 +1,20 @@
 """
-MetaClean — Build & Packaging Script (.exe)
-Mengemas aplikasi MetaClean menjadi satu berkas executable portabel tunggal (.exe)
+Mrclean — Build & Packaging Script (.exe)
+Mengemas aplikasi Mrclean menjadi berkas executable portabel tunggal (.exe)
 dengan menyertakan ikon kustom Material/logo.jpg (assets/icon.ico & assets/logo.png) dan tema CustomTkinter.
 """
 import os
 import sys
+import shutil
 import subprocess
 from src.utils.icon_converter import convert_logo_to_assets
 
-# Pastikan output konsol aman di Windows CP1252
 if sys.stdout.encoding != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
 def build():
     print("=" * 60)
-    print("[*] MEMULAI PROSES BUILD METACLEAN KE STANDALONE .EXE")
+    print("[*] MEMULAI PROSES BUILD MRCLEAN KE STANDALONE .EXE")
     print("=" * 60)
 
     # 1. Pastikan icon.ico dan logo.png terbuat dari Material/logo.jpg
@@ -27,12 +27,12 @@ def build():
     ico_path = os.path.abspath(res["ico_path"])
     print(f"[*] Aset logo berhasil disiapkan dari: {res['source']}")
 
-    # 2. Perintah PyInstaller
+    # 2. Perintah PyInstaller dengan nama Mrclean
     cmd = [
         sys.executable, "-m", "PyInstaller",
         "--noconsole",
         "--onefile",
-        "--name=MetaClean",
+        "--name=Mrclean",
         f"--icon={ico_path}",
         "--collect-all=customtkinter",
         "--add-data=assets;assets",
@@ -48,19 +48,24 @@ def build():
     result = subprocess.run(cmd)
 
     if result.returncode == 0:
-        exe_path = os.path.abspath("dist/MetaClean.exe")
+        exe_path = os.path.abspath("dist/Mrclean.exe")
         if os.path.exists(exe_path):
             size_mb = os.path.getsize(exe_path) / (1024 * 1024)
+            # Salin juga ke root direktori agar mudah diakses
+            root_copy = os.path.abspath("Mrclean.exe")
+            shutil.copy2(exe_path, root_copy)
+
             print("=" * 60)
             print("[SUCCESS] BUILD BERHASIL 100%!")
-            print(f"Berkas Executable : {exe_path}")
+            print(f"Berkas di dist/   : {exe_path}")
+            print(f"Berkas di Root    : {root_copy}")
             print(f"Ukuran Berkas     : {size_mb:.2f} MB")
             print("Ikon & Logo       : Berbasis Material/logo.jpg")
             print("Status Operasional: 100% Offline Standalone")
             print("=" * 60)
             return True
         else:
-            print("[!] Berkas exe tidak ditemukan di dist/")
+            print("[!] Berkas Mrclean.exe tidak ditemukan di dist/")
             return False
     else:
         print(f"[X] Gagal melakukan build. Kode keluar: {result.returncode}")
