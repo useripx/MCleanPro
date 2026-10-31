@@ -27,3 +27,4 @@
 5. **Kompilasi Standalone Executable (.exe):**
    - Berkas mentah `Material/img.png` berhasil dikonversi ke format Windows multi-ukuran `assets/icon.ico`.
    - Berhasil dikompilasi menggunakan PyInstaller menghasilkan file tunggal portabel di `dist/MetaClean.exe` (35.91 MB) dengan ikon kustom `Material/img.png`.
+
