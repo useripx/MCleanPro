@@ -13,11 +13,10 @@ class BaseCleaner(ABC):
         pass
 
     @abstractmethod
-    def clean(self, input_path: str, output_path: Optional[str] = None) -> Dict[str, Any]:
+    def clean(self, input_path: str, output_path: Optional[str] = None, inplace: bool = False) -> Dict[str, Any]:
         """
-        Membersihkan metadata dari berkas input dan menyimpannya ke output_path.
-        Jika output_path None, membuat nama default: <nama>_clean.<ext>.
-        Mengembalikan statistik pembersihan.
+        Membersihkan metadata dari berkas input.
+        Jika inplace=True, berkas asli langsung dibersihkan dan ditimpa di tempat.
+        Jika inplace=False, disimpan ke output_path (default: <nama>_clean.<ext>).
         """
         pass
-

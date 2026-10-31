@@ -109,6 +109,28 @@ class TestCleaners(unittest.TestCase):
             cleaned_text = f.read()
         self.assertEqual(cleaned_text, "# Judul Proyek\n\nDeskripsi teks AI rahasia di sini.")
 
+    def test_markdown_cleaner_inplace(self):
+        # Uji pembersihan langsung di tempat (in-place) pada berkas asli
+        target_path = os.path.join(self.test_dir, "DIRECT_README.md")
+        content = "# Dokumentasi\uFE0F\n\nTeks rahasia\u200D AI."
+        with open(target_path, "w", encoding="utf-8") as f:
+            f.write(content)
+
+        # Jalankan clean_file dengan inplace=True
+        res = clean_file(target_path, inplace=True)
+        self.assertTrue(res["success"])
+        self.assertTrue(res["inplace"])
+
+        # Verifikasi bahwa berkas asli sekarang 100% bersih tanpa watermark
+        inspector = TextInspector()
+        inspect_res = inspector.inspect(target_path)
+        self.assertFalse(inspect_res["has_ai_watermark"])
+        self.assertEqual(inspect_res["metadata_count"], 0)
+
+        with open(target_path, "r", encoding="utf-8") as f:
+            new_content = f.read()
+        self.assertEqual(new_content, "# Dokumentasi\n\nTeks rahasia AI.")
+
     def test_html_cleaner(self):
         # Uji berkas HTML berkode
         in_path = os.path.join(self.test_dir, "index.html")

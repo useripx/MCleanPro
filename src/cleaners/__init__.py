@@ -16,11 +16,11 @@ ALL_CLEANERS = [
     TextCleaner()
 ]
 
-def clean_file(input_path: str, output_path: Optional[str] = None) -> Dict[str, Any]:
-    """Mendeteksi jenis file dan menjalankan cleaner yang sesuai."""
+def clean_file(input_path: str, output_path: Optional[str] = None, inplace: bool = False) -> Dict[str, Any]:
+    """Mendeteksi jenis file dan menjalankan cleaner yang sesuai (mendukung in-place)."""
     for cleaner in ALL_CLEANERS:
         if cleaner.can_clean(input_path):
-            return cleaner.clean(input_path, output_path)
+            return cleaner.clean(input_path, output_path, inplace=inplace)
 
     return {
         "success": False,

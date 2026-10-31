@@ -4,7 +4,7 @@
 > **PROYEK:** MetaClean  
 > **PEMILIK PROYEK:** Yogi Ario  
 > **PENGUJI:** AI Agent (Pair Programmer)  
-> **TANGGAL PENGUJIAN:** 31/10/2026 22:00 WIB  
+> **TANGGAL PENGUJIAN:** 31/10/2026 22:12 WIB  
 > **BRANCH:** `develop`  
 > **PRINSIP UTAMA:** *No Evidence, No Completion. Dilarang menyatakan selesai sebelum terbukti 100% PASS.*
 
@@ -14,8 +14,8 @@
 
 | Metrik | Hasil Aktual | Kriteria Ambang (Threshold) | Status |
 | :--- | :---: | :---: | :---: |
-| **Total Test Cases** | **20** | Minimal 15 per fungsi kritis | `[LULUS]` |
-| **Passed (Lulus)** | **20** | 100% | `[LULUS]` |
+| **Total Test Cases** | **21** | Minimal 15 per fungsi kritis | `[LULUS]` |
+| **Passed (Lulus)** | **21** | 100% | `[LULUS]` |
 | **Failed (Gagal)** | **0** | **Wajib 0** | `[LULUS]` |
 | **Errors / Crashes** | **0** | **Wajib 0** | `[LULUS]` |
 | **Skipped** | **0** | 0 | `[LULUS]` |
@@ -35,7 +35,8 @@
 ## 3. Rincian Kasus Pengujian (Test Suite Breakdown)
 
 ### 3.1 Pembersihan Metadata & Steganografi (Cleaners)
-- `test_markdown_cleaner`: Pembersihan khusus berkas Markdown (`.md`) dengan steganografi `\uFE0F` (Variation Selector-16) dan Zero-Width Space. `[PASS]`
+- `test_markdown_cleaner_inplace`: Pembersihan langsung di tempat (*In-Place Cleaning*) menimpa berkas asli dan memverifikasi `README.md` terbebas dari `\uFE0F` (Variation Selector-16) dan Zero-Width Joiner. `[PASS]`
+- `test_markdown_cleaner`: Pembersihan berkas Markdown (`.md`) sebagai salinan baru. `[PASS]`
 - `test_html_cleaner`: Pembersihan berkas web HTML (`.html`) dari karakter tak terlihat. `[PASS]`
 - `test_code_cleaner`: Pembersihan berkas kode pemrograman Python (`.py`) tanpa merusak sintaks/indentasi. `[PASS]`
 - `test_image_cleaner`: Pembersihan EXIF *lossless* tanpa merusak dimensi & kualitas visual gambar. `[PASS]`
@@ -75,6 +76,7 @@ test_docx_cleaner (test_cleaners.TestCleaners.test_docx_cleaner) ... ok
 test_html_cleaner (test_cleaners.TestCleaners.test_html_cleaner) ... ok
 test_image_cleaner (test_cleaners.TestCleaners.test_image_cleaner) ... ok
 test_markdown_cleaner (test_cleaners.TestCleaners.test_markdown_cleaner) ... ok
+test_markdown_cleaner_inplace (test_cleaners.TestCleaners.test_markdown_cleaner_inplace) ... ok
 test_pdf_cleaner (test_cleaners.TestCleaners.test_pdf_cleaner) ... ok
 test_export_json (test_exporter.TestExporter.test_export_json) ... ok
 test_export_text (test_exporter.TestExporter.test_export_text) ... ok
@@ -91,7 +93,7 @@ test_clean_file_text_watermarks (test_watermarks.TestAIWatermarks.test_clean_fil
 test_clean_text_watermarks_string (test_watermarks.TestAIWatermarks.test_clean_text_watermarks_string) ... ok
 
 ----------------------------------------------------------------------
-Ran 20 tests in 0.452s
+Ran 21 tests in 0.639s
 
 OK
 ```

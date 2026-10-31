@@ -47,49 +47,74 @@ class AIWatermarkCleaner:
         return cleaned_text, stats
 
     @staticmethod
-    def clean_file(input_path: str, output_path: Optional[str] = None) -> Dict[str, Any]:
+    def clean_file(input_path: str, output_path: Optional[str] = None, inplace: bool = False) -> Dict[str, Any]:
         """
         Membersihkan berkas dari watermark AI:
-        - Jika teks: membersihkan invisible unicode steganography.
+        - Jika teks: membersihkan invisible unicode steganography (mendukung inplace).
         - Jika gambar/dokumen/media: membersihkan EXIF, C2PA manifest, dan metadata identitas.
         """
         if not os.path.exists(input_path):
             return {"success": False, "error": f"Berkas tidak ditemukan: {input_path}"}
 
         ext = os.path.splitext(input_path)[1].lower()
-        if output_path is None:
-            dirname, filename = os.path.split(input_path)
-            name, file_ext = os.path.splitext(filename)
-            output_path = os.path.join(dirname, f"{name}_nowatermark{file_ext}")
+        if inplace or output_path == input_path:
+            is_inplace = True
+            output_path = input_path
+            temp_output = f"{input_path}.tmp_wmclean"
+        else:
+            is_inplace = False
+            if output_path is None:
+                dirname, filename = os.path.split(input_path)
+                name, file_ext = os.path.splitext(filename)
+                output_path = os.path.join(dirname, f"{name}_nowatermark{file_ext}")
+            temp_output = output_path
 
-        # 1. Penanganan Khusus Berkas Teks
-        if ext in {".txt", ".md", ".json", ".csv", ".py", ".html", ".xml", ".log"}:
+        # 1. Penanganan Khusus Berkas Teks & Coding
+        from src.utils.scanner import ALL_TEXT_AND_CODE_EXTENSIONS
+        if ext in ALL_TEXT_AND_CODE_EXTENSIONS:
             try:
-                with open(input_path, "r", encoding="utf-8", errors="replace") as f:
-                    content = f.read()
+                content = None
+                for enc in ["utf-8", "utf-8-sig", "latin-1", "cp1252"]:
+                    try:
+                        with open(input_path, "r", encoding=enc) as f:
+                            content = f.read()
+                        break
+                    except UnicodeDecodeError:
+                        continue
+
+                if content is None:
+                    with open(input_path, "r", encoding="utf-8", errors="replace") as f:
+                        content = f.read()
 
                 cleaned_content, stats = AIWatermarkCleaner.clean_text_watermarks(content)
 
-                with open(output_path, "w", encoding="utf-8") as f:
+                with open(temp_output, "w", encoding="utf-8", newline="") as f:
                     f.write(cleaned_content)
+
+                if is_inplace:
+                    os.replace(temp_output, input_path)
 
                 return {
                     "success": True,
                     "input_path": input_path,
                     "output_path": output_path,
+                    "inplace": is_inplace,
                     "type": "text",
                     "watermarks_removed": stats["total_watermarks_removed"],
                     "breakdown": stats["breakdown"],
                     "message": f"Berhasil menghapus {stats['total_watermarks_removed']} karakter watermark tak terlihat."
                 }
             except Exception as e:
+                if is_inplace and os.path.exists(temp_output):
+                    try:
+                        os.remove(temp_output)
+                    except Exception:
+                        pass
                 return {"success": False, "error": f"Gagal memproses berkas teks: {str(e)}"}
 
         # 2. Penanganan Berkas Biner (Gambar, PDF, Media)
-        # Menjalankan pembersihan metadata & C2PA manifest
         from src.cleaners import clean_file as base_clean_file
-        clean_res = base_clean_file(input_path, output_path)
+        clean_res = base_clean_file(input_path, output_path, inplace=inplace)
         if clean_res.get("success"):
             clean_res["message"] = "Manifes C2PA, EXIF, dan metadata provenance berhasil dibersihkan."
         return clean_res
-

@@ -2,7 +2,7 @@
 MetaClean — Modern Desktop GUI
 Antarmuka pengguna grafis berbasis CustomTkinter dengan dukungan Dark/Light mode,
 pemindaian berkas tunggal & batch satu folder, inspeksi detail, pembersihan instan,
-dan dukungan penuh seluruh format dokumen, gambar, audio/video, markdown, serta berkas coding.
+dan dukungan pembersihan di tempat (In-Place Cleaning) untuk menimpa berkas asli secara aman.
 """
 import os
 import sys
@@ -21,16 +21,35 @@ from src.utils.exporter import export_to_json, export_to_text
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")
 
+def get_asset_path(filename: str) -> str:
+    """Mendapatkan path absolut aset, baik saat running via script maupun PyInstaller .exe."""
+    if hasattr(sys, '_MEIPASS'):
+        p = os.path.join(sys._MEIPASS, "assets", filename)
+        if os.path.exists(p):
+            return p
+        p_root = os.path.join(sys._MEIPASS, filename)
+        if os.path.exists(p_root):
+            return p_root
+
+    # Mode pengembangan lokal
+    local_p = os.path.abspath(os.path.join("assets", filename))
+    if os.path.exists(local_p):
+        return local_p
+
+    # Fallback ke direktori proyek
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    return os.path.join(base_dir, "assets", filename)
+
 class MetaCleanApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
         self.title("MetaClean — Offline Metadata & AI Watermarks Tool")
-        self.geometry("1140x730")
-        self.minsize(940, 630)
+        self.geometry("1160x740")
+        self.minsize(960, 640)
 
-        # Ikon Aplikasi (dari assets/icon.ico yang dikonversi dari Material/logo.jpg)
-        icon_path = os.path.abspath("assets/icon.ico")
+        # Ikon Aplikasi Window & Taskbar
+        icon_path = get_asset_path("icon.ico")
         if os.path.exists(icon_path):
             try:
                 self.iconbitmap(icon_path)
@@ -50,13 +69,13 @@ class MetaCleanApp(ctk.CTk):
         self.header_frame.pack(fill="x", padx=15, pady=(15, 10))
 
         # Logo Gambar (assets/logo.png dari Material/logo.jpg)
-        logo_path = os.path.abspath("assets/logo.png")
+        logo_path = get_asset_path("logo.png")
         if os.path.exists(logo_path):
             try:
                 pil_logo = Image.open(logo_path)
-                self.logo_ctk_image = ctk.CTkImage(light_image=pil_logo, dark_image=pil_logo, size=(38, 38))
+                self.logo_ctk_image = ctk.CTkImage(light_image=pil_logo, dark_image=pil_logo, size=(40, 40))
                 self.logo_label = ctk.CTkLabel(self.header_frame, text="", image=self.logo_ctk_image)
-                self.logo_label.pack(side="left", padx=(18, 8), pady=10)
+                self.logo_label.pack(side="left", padx=(18, 10), pady=10)
             except Exception:
                 pass
 
@@ -112,7 +131,16 @@ class MetaCleanApp(ctk.CTk):
             text="Pindai Subfolder"
         )
         self.chk_recursive.select()
-        self.chk_recursive.pack(side="left", padx=15, pady=10)
+        self.chk_recursive.pack(side="left", padx=10, pady=10)
+
+        self.chk_inplace = ctk.CTkCheckBox(
+            self.control_frame,
+            text="Timpa Berkas Asli Langsung (In-Place)",
+            text_color="#80cbc4",
+            font=ctk.CTkFont(size=12, weight="bold")
+        )
+        self.chk_inplace.select()
+        self.chk_inplace.pack(side="left", padx=15, pady=10)
 
         self.btn_clear = ctk.CTkButton(
             self.control_frame,
@@ -129,7 +157,7 @@ class MetaCleanApp(ctk.CTk):
         self.main_paned.pack(fill="both", expand=True, padx=15, pady=5)
 
         # 3A. Left Panel: File List
-        self.left_panel = ctk.CTkFrame(self.main_paned, width=440)
+        self.left_panel = ctk.CTkFrame(self.main_paned, width=450)
         self.left_panel.pack(side="left", fill="both", expand=False, padx=(5, 5), pady=5)
 
         self.left_header = ctk.CTkLabel(
@@ -139,7 +167,7 @@ class MetaCleanApp(ctk.CTk):
         )
         self.left_header.pack(anchor="w", padx=15, pady=(10, 5))
 
-        self.file_scroll = ctk.CTkScrollableFrame(self.left_panel, width=420)
+        self.file_scroll = ctk.CTkScrollableFrame(self.left_panel, width=430)
         self.file_scroll.pack(fill="both", expand=True, padx=10, pady=(5, 10))
 
         # 3B. Right Panel: Metadata & Watermark Details
@@ -164,7 +192,7 @@ class MetaCleanApp(ctk.CTk):
 
         self.btn_clean_selected = ctk.CTkButton(
             self.bottom_bar,
-            text="🛡️ Bersihkan Metadata Terpilih",
+            text="🛡️ Bersihkan Berkas Terpilih",
             font=ctk.CTkFont(weight="bold"),
             command=self._clean_selected_file
         )
@@ -182,7 +210,7 @@ class MetaCleanApp(ctk.CTk):
 
         self.btn_clean_ai = ctk.CTkButton(
             self.bottom_bar,
-            text="🤖 Hapus Watermark AI",
+            text="🤖 Hapus Watermark AI Saja",
             fg_color="#673ab7",
             hover_color="#512da8",
             font=ctk.CTkFont(weight="bold"),
@@ -409,7 +437,7 @@ class MetaCleanApp(ctk.CTk):
 
         # Categories & Tag Details
         categories = item.get("categories", {})
-        if not categories:
+        if not categories or not item.get("has_metadata"):
             no_meta_lbl = ctk.CTkLabel(
                 self.detail_scroll,
                 text="✅ Tidak ditemukan metadata sensitif atau berkas sudah bersih murni.",
@@ -470,16 +498,27 @@ class MetaCleanApp(ctk.CTk):
             return
 
         path = self.selected_item.get("file_path")
-        res = clean_file(path)
+        inplace = bool(self.chk_inplace.get())
+        res = clean_file(path, inplace=inplace)
 
         if res.get("success"):
-            out_file = os.path.basename(res.get("output_path"))
-            messagebox.showinfo("Berhasil", f"Metadata & Watermark AI berhasil dibersihkan!\nDisimpan sebagai:\n{out_file}")
-            # Refresh inspection
-            new_info = inspect_file(res.get("output_path"))
-            self.scanned_items.append(new_info)
+            target_path = path if inplace else res.get("output_path")
+            new_info = inspect_file(target_path)
+
+            if inplace:
+                # Perbarui data item di daftar secara in-place
+                for idx, it in enumerate(self.scanned_items):
+                    if it.get("file_path") == path:
+                        self.scanned_items[idx] = new_info
+                        break
+            else:
+                self.scanned_items.append(new_info)
+
             self._refresh_file_list()
             self._display_detail(new_info)
+
+            msg_location = "di tempat (berkas asli telah bersih)" if inplace else f"sebagai berkas baru:\n{os.path.basename(target_path)}"
+            messagebox.showinfo("Berhasil", f"Metadata & Watermark AI berhasil dibersihkan {msg_location}!")
         else:
             messagebox.showerror("Gagal", res.get("error", "Gagal membersihkan berkas."))
 
@@ -488,33 +527,49 @@ class MetaCleanApp(ctk.CTk):
             messagebox.showinfo("Petunjuk", "Tidak ada berkas di daftar untuk dibersihkan.")
             return
 
+        inplace = bool(self.chk_inplace.get())
+        mode_str = "langsung di tempat (menimpa berkas asli)" if inplace else "sebagai salinan baru (<nama>_clean.<ext>)"
         confirm = messagebox.askyesno(
             "Konfirmasi Pembersihan Batch",
-            f"Apakah Anda ingin membersihkan metadata dari {len(self.scanned_items)} berkas?\n\nBerkas bersih akan disimpan sebagai salinan baru (<nama>_clean.<ext>)."
+            f"Apakah Anda ingin membersihkan metadata dari {len(self.scanned_items)} berkas?\n\nMode: Pembersihan {mode_str}."
         )
         if not confirm:
             return
 
-        self.status_bar.configure(text="⚡ Sedang membersihkan seluruh berkas di folder...")
+        self.status_bar.configure(text="⚡ Sedang membersihkan seluruh berkas...")
 
         def worker():
             success_count = 0
             new_items = []
-            for item in self.scanned_items:
-                path = item.get("file_path")
-                res = clean_file(path)
+            for idx, item in enumerate(self.scanned_items):
+                p = item.get("file_path")
+                res = clean_file(p, inplace=inplace)
                 if res.get("success"):
                     success_count += 1
-                    cleaned_info = inspect_file(res.get("output_path"))
-                    new_items.append(cleaned_info)
+                    target_p = p if inplace else res.get("output_path")
+                    cleaned_info = inspect_file(target_p)
+                    if inplace:
+                        self.scanned_items[idx] = cleaned_info
+                    else:
+                        new_items.append(cleaned_info)
 
             def on_finish():
-                self.scanned_items.extend(new_items)
+                if not inplace:
+                    self.scanned_items.extend(new_items)
                 self._refresh_file_list()
+
+                # Refresh detail jika sedang ada yang dipilih
+                if self.selected_item:
+                    sel_path = self.selected_item.get("file_path")
+                    for it in self.scanned_items:
+                        if it.get("file_path") == sel_path:
+                            self._display_detail(it)
+                            break
+
                 self.status_bar.configure(text=f"Pembersihan batch selesai: {success_count} berkas berhasil dibersihkan.")
                 messagebox.showinfo(
                     "Selesai",
-                    f"Pembersihan Batch Berhasil!\n{success_count} dari {len(self.scanned_items)} berkas telah dibersihkan."
+                    f"Pembersihan Batch Berhasil!\n{success_count} berkas telah dibersihkan {mode_str}."
                 )
 
             self.after(0, on_finish)
@@ -527,19 +582,30 @@ class MetaCleanApp(ctk.CTk):
             return
 
         path = self.selected_item.get("file_path")
-        res = AIWatermarkCleaner.clean_file(path)
+        inplace = bool(self.chk_inplace.get())
+        res = AIWatermarkCleaner.clean_file(path, inplace=inplace)
 
         if res.get("success"):
-            out_file = os.path.basename(res.get("output_path"))
+            target_path = path if inplace else res.get("output_path")
             wm_count = res.get("watermarks_removed", "Semua")
-            messagebox.showinfo(
-                "Berhasil",
-                f"Watermark AI ({wm_count} tanda air) berhasil dihapus!\nDisimpan sebagai:\n{out_file}"
-            )
-            new_info = inspect_file(res.get("output_path"))
-            self.scanned_items.append(new_info)
+            new_info = inspect_file(target_path)
+
+            if inplace:
+                for idx, it in enumerate(self.scanned_items):
+                    if it.get("file_path") == path:
+                        self.scanned_items[idx] = new_info
+                        break
+            else:
+                self.scanned_items.append(new_info)
+
             self._refresh_file_list()
             self._display_detail(new_info)
+
+            msg_location = "di tempat" if inplace else f"sebagai:\n{os.path.basename(target_path)}"
+            messagebox.showinfo(
+                "Berhasil",
+                f"Watermark AI ({wm_count} tanda air) berhasil dihapus {msg_location}!"
+            )
         else:
             messagebox.showerror("Gagal", res.get("error", "Gagal menghapus watermark."))
 
