@@ -134,10 +134,23 @@ Menghasilkan aplikasi desktop Windows berbasis Python (CustomTkinter) yang dikem
 - [ ] Uji fungsionalitas GUI dan penanganan error file korup.
 
 ### 📦 Batch 3: Packaging Standalone Executable (.exe) & Rilis
-- [ ] Buat skrip `build_exe.py` untuk menjalankan PyInstaller dengan flag `--windowed --onefile --icon=assets/icon.ico`.
-- [ ] Eksekusi proses build dan verifikasi hasil di `dist/MetaClean.exe`.
-- [ ] Verifikasi bahwa `.exe` dapat dibuka secara mandiri, ikon `img.png` tampil pada taskbar & jendela aplikasi, serta seluruh fitur bekerja 100% offline.
-- [ ] Catat changelog final di `changelog/`.
+- [x] Buat skrip `build_exe.py` untuk menjalankan PyInstaller dengan flag `--windowed --onefile --icon=assets/icon.ico`.
+- [x] Eksekusi proses build dan verifikasi hasil di `dist/MetaClean.exe`.
+- [x] Verifikasi bahwa `.exe` dapat dibuka secara mandiri dan seluruh fitur bekerja 100% offline.
+- [x] Catat changelog final di `changelog/`.
+
+### 📦 Batch 4: Pembaruan Logo ke Material/logo.jpg & Pembersih Format Markdown (.md) serta Berkas Coding (.html, .js, .py, dll.)
+- [ ] **Pembaruan Logo Baru (Material/logo.jpg):**
+  - Konversi aset `Material/logo.jpg` menjadi `assets/icon.ico` (multi-resolusi 16x16 hingga 256x256).
+  - Buat berkas `assets/logo.png` untuk ditampilkan langsung pada header jendela GUI aplikasi.
+  - Perbarui `build_exe.py` untuk mengemas aplikasi dengan ikon baru.
+- [ ] **Perbaikan Pembersih Markdown (.md) & Seluruh Format Berkas Coding:**
+  - Dukungan format: `.md`, `.html`, `.css`, `.js`, `.jsx`, `.ts`, `.tsx`, `.vue`, `.php`, `.py`, `.java`, `.c`, `.cpp`, `.cs`, `.go`, `.rs`, `.json`, `.xml`, `.yaml`, `.sql`, `.sh`.
+  - Buat `src/cleaners/text_cleaner.py` untuk membersihkan steganografi AI (zero-width spaces, variation selector `\uFE0F`, dsb.) dari file `.md` dan seluruh berkas bahasa pemrograman / coding.
+  - Daftarkan `TextCleaner` ke dalam `src/cleaners/__init__.py`.
+  - Tambahkan unit test verifikasi pembersihan file markdown dan kode di `tests/test_cleaners.py`.
+  - Eksekusi automated test suite hingga **100% PASS (0 GAGAL / 0 ERROR)**.
+  - Re-build berkas executable `dist/MetaClean.exe`.
 
 ---
 
@@ -168,9 +181,9 @@ Menghasilkan aplikasi desktop Windows berbasis Python (CustomTkinter) yang dikem
 
 > 🛑 **Dilarang keras mengeksekusi kode aplikasi sebelum Yogi Ario memberikan persetujuan eksplisit terhadap rencana ini.**
 
-- [x] Rencana telah ditinjau oleh Yogi Ario
-- [x] Status Persetujuan: **DISETUJUI (APPROVED)**
-- [x] Tanggal Persetujuan: `31/10/2026`
-- [x] Catatan Khusus dari Pemilik Proyek:
-  > *"Semua dokumen bisa dicek dalam 1 folder (batch) atau per-file, dikemas menjadi file .exe portabel dengan ikon kustom Material/img.png."*
+- [x] Batch 1-3 Disetujui & Selesai (31/10/2026)
+- [x] **Batch 4: Pembaruan Logo (`Material/logo.jpg`) & Pembersih Markdown + Berkas Coding**
+  - Status Persetujuan: **DISETUJUI (APPROVED)**
+  - Tanggal Persetujuan: `31/10/2026 21:56 WIB`
+  - Catatan Pemilik Proyek: *"oke gas tambahkan bisa html, dll yang berformat coding"*
 

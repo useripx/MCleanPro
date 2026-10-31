@@ -1,13 +1,15 @@
 """
 MetaClean — Modern Desktop GUI
 Antarmuka pengguna grafis berbasis CustomTkinter dengan dukungan Dark/Light mode,
-pemindaian berkas tunggal & batch satu folder, inspeksi detail, dan pembersihan instan.
+pemindaian berkas tunggal & batch satu folder, inspeksi detail, pembersihan instan,
+dan dukungan penuh seluruh format dokumen, gambar, audio/video, markdown, serta berkas coding.
 """
 import os
 import sys
 import threading
 from tkinter import filedialog, messagebox
 import customtkinter as ctk
+from PIL import Image
 
 from src.utils.scanner import scan_files
 from src.inspectors import inspect_file
@@ -24,10 +26,10 @@ class MetaCleanApp(ctk.CTk):
         super().__init__()
 
         self.title("MetaClean — Offline Metadata & AI Watermarks Tool")
-        self.geometry("1120x720")
-        self.minsize(920, 620)
+        self.geometry("1140x730")
+        self.minsize(940, 630)
 
-        # Ikon Aplikasi (dari assets/icon.ico yang dikonversi dari Material/img.png)
+        # Ikon Aplikasi (dari assets/icon.ico yang dikonversi dari Material/logo.jpg)
         icon_path = os.path.abspath("assets/icon.ico")
         if os.path.exists(icon_path):
             try:
@@ -47,17 +49,28 @@ class MetaCleanApp(ctk.CTk):
         self.header_frame = ctk.CTkFrame(self, corner_radius=10, height=75)
         self.header_frame.pack(fill="x", padx=15, pady=(15, 10))
 
+        # Logo Gambar (assets/logo.png dari Material/logo.jpg)
+        logo_path = os.path.abspath("assets/logo.png")
+        if os.path.exists(logo_path):
+            try:
+                pil_logo = Image.open(logo_path)
+                self.logo_ctk_image = ctk.CTkImage(light_image=pil_logo, dark_image=pil_logo, size=(38, 38))
+                self.logo_label = ctk.CTkLabel(self.header_frame, text="", image=self.logo_ctk_image)
+                self.logo_label.pack(side="left", padx=(18, 8), pady=10)
+            except Exception:
+                pass
+
         # Title & Subtitle
         self.title_label = ctk.CTkLabel(
             self.header_frame,
-            text="🛡️ MetaClean",
+            text="MetaClean",
             font=ctk.CTkFont(size=22, weight="bold")
         )
-        self.title_label.pack(side="left", padx=(20, 10), pady=12)
+        self.title_label.pack(side="left", padx=(0, 10), pady=12)
 
         self.subtitle_label = ctk.CTkLabel(
             self.header_frame,
-            text="Pemeriksa & Pembersih Metadata Offline + AI Watermark Remover | Dikembangkan untuk Yogi Ario",
+            text="Pemeriksa & Pembersih Metadata Offline + AI Watermarks Remover | Dikembangkan untuk Yogi Ario",
             font=ctk.CTkFont(size=12),
             text_color="gray"
         )
@@ -219,11 +232,12 @@ class MetaCleanApp(ctk.CTk):
 
     def _on_choose_files(self):
         filetypes = [
-            ("Semua Berkas yang Didukung", "*.jpg;*.jpeg;*.png;*.webp;*.pdf;*.docx;*.mp3;*.mp4;*.txt;*.md"),
+            ("Semua Berkas yang Didukung", "*.jpg;*.jpeg;*.png;*.webp;*.pdf;*.docx;*.mp3;*.mp4;*.md;*.txt;*.html;*.js;*.py;*.php;*.java;*.cpp;*.json;*.xml;*.yaml"),
+            ("Berkas Markdown (*.md)", "*.md;*.markdown"),
+            ("Berkas Kode Pemrograman (*.html, *.js, *.py, dll.)", "*.html;*.htm;*.css;*.js;*.jsx;*.ts;*.tsx;*.py;*.php;*.java;*.c;*.cpp;*.cs;*.go;*.rs;*.json;*.xml;*.yaml;*.sql;*.sh"),
             ("Gambar (JPG, PNG, WEBP)", "*.jpg;*.jpeg;*.png;*.webp;*.tiff;*.bmp"),
             ("Dokumen (PDF, Word)", "*.pdf;*.docx"),
             ("Media (Audio & Video)", "*.mp3;*.mp4;*.wav;*.mkv;*.m4a"),
-            ("Teks & Markdown", "*.txt;*.md;*.json;*.csv;*.py"),
             ("Seluruh Berkas (*.*)", "*.*")
         ]
         paths = filedialog.askopenfilenames(title="Pilih Berkas untuk Diperiksa", filetypes=filetypes)
@@ -460,7 +474,7 @@ class MetaCleanApp(ctk.CTk):
 
         if res.get("success"):
             out_file = os.path.basename(res.get("output_path"))
-            messagebox.showinfo("Berhasil", f"Metadata berhasil dibersihkan!\nDisimpan sebagai:\n{out_file}")
+            messagebox.showinfo("Berhasil", f"Metadata & Watermark AI berhasil dibersihkan!\nDisimpan sebagai:\n{out_file}")
             # Refresh inspection
             new_info = inspect_file(res.get("output_path"))
             self.scanned_items.append(new_info)
@@ -509,7 +523,7 @@ class MetaCleanApp(ctk.CTk):
 
     def _clean_ai_watermarks(self):
         if not self.selected_item:
-            messagebox.showinfo("Petunjuk", "Silakan pilih berkas teks/media di daftar untuk dibersihkan watermarknya.")
+            messagebox.showinfo("Petunjuk", "Silakan pilih berkas di daftar untuk dibersihkan watermarknya.")
             return
 
         path = self.selected_item.get("file_path")
@@ -559,4 +573,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

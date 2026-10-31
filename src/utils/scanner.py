@@ -1,22 +1,41 @@
 """
 MetaClean — File & Folder Scanner Utility
-Mendukung pemindaian berkas tunggal (per file) maupun seluruh isi direktori (batch folder scan).
+Mendukung pemindaian berkas tunggal (per file) maupun seluruh isi direktori (batch folder scan),
+mencakup berkas dokumen, gambar, audio/video, markdown, dan seluruh format kode pemrograman (HTML, JS, Python, dll.).
 """
 import os
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".tiff", ".tif", ".bmp", ".gif"}
 PDF_EXTENSIONS = {".pdf"}
 DOCX_EXTENSIONS = {".docx"}
 MEDIA_EXTENSIONS = {".mp3", ".mp4", ".m4a", ".wav", ".flac", ".ogg", ".mkv", ".avi", ".wma"}
-TEXT_EXTENSIONS = {".txt", ".md", ".json", ".csv", ".py", ".html", ".xml", ".log"}
+
+MARKDOWN_EXTENSIONS = {".md", ".markdown"}
+TEXT_EXTENSIONS = {".txt", ".log", ".csv"}
+
+CODING_EXTENSIONS = {
+    # Web Front-End
+    ".html", ".htm", ".css", ".scss", ".sass", ".less",
+    ".js", ".jsx", ".ts", ".tsx", ".vue", ".svelte",
+    # Back-End & General Languages
+    ".py", ".pyw", ".php", ".phtml",
+    ".java", ".c", ".cpp", ".cc", ".cxx", ".h", ".hpp", ".cs",
+    ".go", ".rs", ".rb", ".swift", ".kt", ".kts", ".dart",
+    # Data, Config & Database
+    ".json", ".xml", ".yaml", ".yml", ".toml", ".ini", ".sql",
+    # Shell Scripts
+    ".sh", ".bash", ".bat", ".cmd", ".ps1"
+}
+
+ALL_TEXT_AND_CODE_EXTENSIONS = MARKDOWN_EXTENSIONS | TEXT_EXTENSIONS | CODING_EXTENSIONS
 
 ALL_SUPPORTED_EXTENSIONS = (
     IMAGE_EXTENSIONS
     | PDF_EXTENSIONS
     | DOCX_EXTENSIONS
     | MEDIA_EXTENSIONS
-    | TEXT_EXTENSIONS
+    | ALL_TEXT_AND_CODE_EXTENSIONS
 )
 
 def get_file_category(file_path: str) -> str:
@@ -30,6 +49,10 @@ def get_file_category(file_path: str) -> str:
         return "docx"
     elif ext in MEDIA_EXTENSIONS:
         return "media"
+    elif ext in MARKDOWN_EXTENSIONS:
+        return "markdown"
+    elif ext in CODING_EXTENSIONS:
+        return "coding"
     elif ext in TEXT_EXTENSIONS:
         return "text"
     return "unknown"
@@ -64,7 +87,7 @@ def scan_files(paths: List[str], recursive: bool = True) -> List[Dict[str, Any]]
                     file_path = os.path.abspath(os.path.join(root, file))
                     if file_path in seen_paths:
                         continue
-                    
+
                     ext = os.path.splitext(file)[1].lower()
                     if ext in ALL_SUPPORTED_EXTENSIONS:
                         seen_paths.add(file_path)
@@ -79,4 +102,3 @@ def scan_files(paths: List[str], recursive: bool = True) -> List[Dict[str, Any]]
                     break
 
     return discovered_files
-

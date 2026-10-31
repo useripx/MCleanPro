@@ -6,12 +6,14 @@ from src.cleaners.image_cleaner import ImageCleaner
 from src.cleaners.pdf_cleaner import PdfCleaner
 from src.cleaners.docx_cleaner import DocxCleaner
 from src.cleaners.media_cleaner import MediaCleaner
+from src.cleaners.text_cleaner import TextCleaner
 
 ALL_CLEANERS = [
     ImageCleaner(),
     PdfCleaner(),
     DocxCleaner(),
-    MediaCleaner()
+    MediaCleaner(),
+    TextCleaner()
 ]
 
 def clean_file(input_path: str, output_path: Optional[str] = None) -> Dict[str, Any]:
@@ -25,4 +27,3 @@ def clean_file(input_path: str, output_path: Optional[str] = None) -> Dict[str, 
         "input_path": input_path,
         "error": "Format berkas tidak didukung untuk pembersihan otomatis."
     }
-

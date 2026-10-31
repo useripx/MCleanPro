@@ -3,7 +3,7 @@
 > **STATUS PROYEK KESELURUHAN:** `Completed (Ready for User Acceptance)`  
 > **PROGRES GLOBAL:** `100%`  
 > **PEMILIK PROYEK:** Yogi Ario  
-> **TERAKHIR DIPERBARUI:** 31/10/2026 21:33 WIB  
+> **TERAKHIR DIPERBARUI:** 31/10/2026 22:04 WIB  
 
 ---
 
@@ -12,10 +12,10 @@
 | Fase | Nama Fase / Milestone | Bobot (%) | Status | Catatan Singkat |
 | :---: | :--- | :---: | :---: | :--- |
 | **Fase 1** | Setup Tata Kelola, Struktur Direktori & Aturan | 15% | `[COMPLETED]` | Git repo, .gitignore, Docs/, Material/ |
-| **Fase 2** | Desain Arsitektur & Perencanaan (Implementation Plan) | 15% | `[COMPLETED]` | Disetujui Mas Yogi Ario (batch folder & per-file) |
-| **Fase 3** | Implementasi Engine Inspektor, Cleaner & Watermark | 35% | `[COMPLETED]` | 100% PASS (17 Unit Tests, 0 Gagal) |
-| **Fase 4** | Implementasi GUI Desktop (CustomTkinter & Drag-Drop) | 20% | `[COMPLETED]` | Antarmuka modern, Dark/Light, Batch & Single |
-| **Fase 5** | Packaging Standalone .exe & Ikon img.png | 15% | `[COMPLETED]` | Berhasil dibuild ke dist/MetaClean.exe (35.91 MB) |
+| **Fase 2** | Desain Arsitektur & Perencanaan (Implementation Plan) | 15% | `[COMPLETED]` | Disetujui Mas Yogi Ario |
+| **Fase 3** | Implementasi Engine Inspektor, Cleaner & Watermark | 30% | `[COMPLETED]` | 20 Unit Tests PASS, 0 Gagal |
+| **Fase 4** | Implementasi GUI Desktop (CustomTkinter & Drag-Drop) | 20% | `[COMPLETED]` | Header Logo Baru, Dark/Light, Batch Scan |
+| **Fase 5** | Pembaruan Logo `Material/logo.jpg` & Pembersih Coding | 20% | `[COMPLETED]` | Sukses rebuild ke dist/MetaClean.exe (35.92 MB) |
 | **TOTAL** | | **100%** | **`100%`** | Seluruh fitur selesai dan terverifikasi |
 
 ---
@@ -24,30 +24,29 @@
 
 ### 📌 Fase 1: Setup Tata Kelola, Struktur Direktori & Aturan
 - [x] Konfigurasi `.gitignore` dan `.env.example`.
-- [x] Salin dan amankan aset desain mentah `img.png` ke folder `Material/` (READ-ONLY).
+- [x] Amankan aset desain mentah `Material/logo.jpg` dan `Material/img.png` (READ-ONLY).
 - [x] Inisialisasi berkas panduan AI `AGENTS.md` dan `GEMINI.md`.
-- [x] Migrasi dan standarisasi kerangka kerja `Docs/universal-rule.md`.
+- [x] Standarisasi kerangka kerja `Docs/universal-rule.md`.
 - [x] Konfigurasi branch `main` dan `develop`.
 
 ### 📌 Fase 2: Desain Arsitektur & Perencanaan (Implementation Plan)
-- [x] Penyusunan `Docs/Implementation_plan.md` mencakup Cek Metadata, Pembersih Metadata, Watermark Remover, GUI, dan packaging `.exe`.
-- [x] Peninjauan dan persetujuan eksplisit dari Mas Yogi Ario (*Approval Gate*).
+- [x] Penyusunan dan persetujuan `Docs/Implementation_plan.md` Batch 1 s.d. Batch 4 oleh Yogi Ario.
 
-### 📌 Fase 3: Implementasi Engine Core (100% PASS Gate)
-- [x] Modul `inspectors`: Ekstraksi EXIF gambar, GPS, metadata dokumen PDF/Word, dan audio/video tags.
-- [x] Modul `cleaners`: Pembersihan metadata *lossless* untuk gambar, dokumen, dan media.
-- [x] Modul `watermarks`: Deteksi dan pembersihan invisible Unicode steganography (berbasis `guillaumemeyer/watermarks-remover`) & metadata C2PA.
-- [x] Test suite 17 unit test menghasilkan **100% PASS (0 GAGAL / 0 ERROR)**.
+### 📌 Fase 3: Implementasi Engine Core & Cleaners
+- [x] Modul `inspectors`: Ekstraksi EXIF gambar, GPS, metadata PDF, DOCX, media, dan teks/coding.
+- [x] Modul `cleaners`: Pembersih *lossless* untuk Gambar, PDF, DOCX, Media, Markdown, dan berkas Coding.
+- [x] Modul `watermarks`: Pembersihan steganografi tersembunyi AI (`\uFE0F`, zero-width characters) dan C2PA.
+- [x] Test suite 20 unit test menghasilkan **100% PASS (0 GAGAL / 0 ERROR)**.
 
 ### 📌 Fase 4: Antarmuka Pengguna (GUI Desktop)
-- [x] Integrasi antarmuka CustomTkinter modern (Dark/Light mode).
-- [x] Fitur pemindaian per-file maupun batch satu folder (dengan opsi rekursif subfolder).
-- [x] Panel pratinjau tabel metadata interaktif dan tombol aksi cepat (Bersihkan Metadata / Hapus Watermark AI / Ekspor Laporan).
+- [x] Tampilan CustomTkinter modern dengan Dark/Light mode.
+- [x] Penampilan logo baru `assets/logo.png` (dari `Material/logo.jpg`) pada header.
+- [x] Pemindaian berkas per-file maupun batch satu folder (dengan opsi rekursif subfolder).
+- [x] Panel inspeksi detail dan tombol aksi pembersihan batch & individual.
 
-### 📌 Fase 5: Pengujian Otomatis & Packaging .exe
-- [x] Automated Test Suite di `tests/` dengan hasil `100% PASS`.
-- [x] Konversi `Material/img.png` menjadi `assets/icon.ico`.
-- [x] Build standalone `.exe` menggunakan PyInstaller dengan ikon kustom `icon.ico` menghasilkan `dist/MetaClean.exe` (35.91 MB).
+### 📌 Fase 5: Packaging Standalone .exe & Logo Baru
+- [x] Konversi `Material/logo.jpg` menjadi `assets/icon.ico` dan `assets/logo.png`.
+- [x] Kompilasi PyInstaller menghasilkan file tunggal portabel di `dist/MetaClean.exe` (35.92 MB) dengan ikon kustom `Material/logo.jpg`.
 - [x] Verifikasi berkas eksekutabel offline siap pakai.
 
 ---
@@ -56,10 +55,11 @@
 
 | ID | Tanggal Ditemukan | Deskripsi Kendala / Blocker | Dampak | Rencana Penyelesaian | Status |
 | :---: | :---: | :--- | :--- | :--- | :---: |
-| - | - | Tidak ada kendala aktif. Seluruh pengujian dan build berhasil. | - | - | `[RESOLVED]` |
+| **BLK-01** | 31/10/2026 | Berkas Markdown (.md) belum didukung `clean_file()` | Tombol Bersihkan Metadata gagal untuk .md | Membuat `TextCleaner` & mendaftarkannya ke dispatcher | `[RESOLVED]` |
+| **BLK-02** | 31/10/2026 | PyInstaller terkunci karena `MetaClean.exe` aktif | Build gagal (WinError 5 Access Denied) | Menghentikan proses lama sebelum menulis file exe baru | `[RESOLVED]` |
 
 ---
 
 ## 4. Riwayat Sesi Pengerjaan Terakhir
 
-- **31/10/2026 - 21:33 WIB:** Penyelesaian implementasi engine core, GUI CustomTkinter, pengujian 17 test cases 100% PASS, dan packaging ke `dist/MetaClean.exe`.
+- **31/10/2026 - 22:04 WIB:** Implementasi `TextCleaner` untuk Markdown dan seluruh berkas coding (`.html`, `.js`, `.py`, dll.), pembaruan logo ke `Material/logo.jpg`, kelulusan 20 unit tests 100% PASS, dan kompilasi ulang `dist/MetaClean.exe`.

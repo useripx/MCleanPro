@@ -35,6 +35,9 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(get_file_category("arsip.pdf"), "pdf")
         self.assertEqual(get_file_category("tugas.docx"), "docx")
         self.assertEqual(get_file_category("musik.mp3"), "media")
+        self.assertEqual(get_file_category("README.md"), "markdown")
+        self.assertEqual(get_file_category("index.html"), "coding")
+        self.assertEqual(get_file_category("script.py"), "coding")
         self.assertEqual(get_file_category("artikel.txt"), "text")
         self.assertEqual(get_file_category("unknown.xyz"), "unknown")
 

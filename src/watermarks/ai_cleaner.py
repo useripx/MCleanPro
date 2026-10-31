@@ -8,7 +8,6 @@ import os
 import re
 from typing import Dict, Any, Tuple, Optional
 from src.inspectors.text_inspector import is_invisible_char, get_char_name
-from src.cleaners import clean_file
 
 # Daftar regex pattern untuk karakter watermark tersembunyi
 # Termasuk: U+200B..U+200F, U+202A..U+202E, U+2060..U+2064, U+FEFF, U+180E, U+FE00..U+FE0F
@@ -88,7 +87,8 @@ class AIWatermarkCleaner:
 
         # 2. Penanganan Berkas Biner (Gambar, PDF, Media)
         # Menjalankan pembersihan metadata & C2PA manifest
-        clean_res = clean_file(input_path, output_path)
+        from src.cleaners import clean_file as base_clean_file
+        clean_res = base_clean_file(input_path, output_path)
         if clean_res.get("success"):
             clean_res["message"] = "Manifes C2PA, EXIF, dan metadata provenance berhasil dibersihkan."
         return clean_res

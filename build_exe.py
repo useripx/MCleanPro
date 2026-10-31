@@ -1,12 +1,12 @@
 """
 MetaClean — Build & Packaging Script (.exe)
 Mengemas aplikasi MetaClean menjadi satu berkas executable portabel tunggal (.exe)
-dengan menyertakan ikon kustom Material/img.png (assets/icon.ico) dan aset tema CustomTkinter.
+dengan menyertakan ikon kustom Material/logo.jpg (assets/icon.ico & assets/logo.png) dan tema CustomTkinter.
 """
 import os
 import sys
 import subprocess
-from src.utils.icon_converter import convert_png_to_ico
+from src.utils.icon_converter import convert_logo_to_assets
 
 # Pastikan output konsol aman di Windows CP1252
 if sys.stdout.encoding != 'utf-8':
@@ -17,15 +17,15 @@ def build():
     print("[*] MEMULAI PROSES BUILD METACLEAN KE STANDALONE .EXE")
     print("=" * 60)
 
-    # 1. Pastikan icon.ico terbuat dari Material/img.png
-    ico_path = os.path.abspath("assets/icon.ico")
-    png_path = os.path.abspath("Material/img.png")
-    
-    if os.path.exists(png_path):
-        print(f"[*] Mengonversi aset mentah {png_path} ke {ico_path}...")
-        convert_png_to_ico(png_path, ico_path)
-    else:
-        print("[!] Peringatan: Material/img.png tidak ditemukan, menggunakan ikon default.")
+    # 1. Pastikan icon.ico dan logo.png terbuat dari Material/logo.jpg
+    res = convert_logo_to_assets(
+        primary_input="Material/logo.jpg",
+        fallback_input="Material/img.png",
+        ico_output="assets/icon.ico",
+        png_output="assets/logo.png"
+    )
+    ico_path = os.path.abspath(res["ico_path"])
+    print(f"[*] Aset logo berhasil disiapkan dari: {res['source']}")
 
     # 2. Perintah PyInstaller
     cmd = [
@@ -55,7 +55,7 @@ def build():
             print("[SUCCESS] BUILD BERHASIL 100%!")
             print(f"Berkas Executable : {exe_path}")
             print(f"Ukuran Berkas     : {size_mb:.2f} MB")
-            print("Ikon Aplikasi     : Berbasis Material/img.png")
+            print("Ikon & Logo       : Berbasis Material/logo.jpg")
             print("Status Operasional: 100% Offline Standalone")
             print("=" * 60)
             return True

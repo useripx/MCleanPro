@@ -12,9 +12,11 @@ from src.cleaners import clean_file
 from src.cleaners.image_cleaner import ImageCleaner
 from src.cleaners.pdf_cleaner import PdfCleaner
 from src.cleaners.docx_cleaner import DocxCleaner
+from src.cleaners.text_cleaner import TextCleaner
 from src.inspectors.image_inspector import ImageInspector
 from src.inspectors.pdf_inspector import PdfInspector
 from src.inspectors.docx_inspector import DocxInspector
+from src.inspectors.text_inspector import TextInspector
 
 class TestCleaners(unittest.TestCase):
     def setUp(self):
@@ -83,6 +85,62 @@ class TestCleaners(unittest.TestCase):
         inspect_res = inspector.inspect(out_path)
         self.assertFalse(inspect_res["has_metadata"])
 
+    def test_markdown_cleaner(self):
+        # Uji khusus berkas README.md dengan Variation Selector-16 (U+FE0F) dan Zero-Width Space
+        in_path = os.path.join(self.test_dir, "README.md")
+        out_path = os.path.join(self.test_dir, "README_clean.md")
+        
+        md_content = "# Judul Proyek\uFE0F\n\nDeskripsi teks AI rahasia\u200B di sini."
+        with open(in_path, "w", encoding="utf-8") as f:
+            f.write(md_content)
+
+        # Uji via clean_file dispatcher utama
+        res = clean_file(in_path, out_path)
+        self.assertTrue(res["success"])
+        self.assertTrue(os.path.exists(out_path))
+
+        # Verifikasi hasil pembersihan menggunakan TextInspector
+        inspector = TextInspector()
+        inspect_res = inspector.inspect(out_path)
+        self.assertFalse(inspect_res["has_ai_watermark"])
+        self.assertEqual(inspect_res["metadata_count"], 0)
+
+        with open(out_path, "r", encoding="utf-8") as f:
+            cleaned_text = f.read()
+        self.assertEqual(cleaned_text, "# Judul Proyek\n\nDeskripsi teks AI rahasia di sini.")
+
+    def test_html_cleaner(self):
+        # Uji berkas HTML berkode
+        in_path = os.path.join(self.test_dir, "index.html")
+        out_path = os.path.join(self.test_dir, "index_clean.html")
+
+        html_content = "<html>\u200C<body><h1>Halo\u200D Dunia</h1></body></html>"
+        with open(in_path, "w", encoding="utf-8") as f:
+            f.write(html_content)
+
+        res = clean_file(in_path, out_path)
+        self.assertTrue(res["success"])
+
+        inspector = TextInspector()
+        inspect_res = inspector.inspect(out_path)
+        self.assertFalse(inspect_res["has_ai_watermark"])
+
+    def test_code_cleaner(self):
+        # Uji berkas skrip Python (.py)
+        in_path = os.path.join(self.test_dir, "app.py")
+        out_path = os.path.join(self.test_dir, "app_clean.py")
+
+        code_content = "def hello():\n    print('Hello\u200B World')\n"
+        with open(in_path, "w", encoding="utf-8") as f:
+            f.write(code_content)
+
+        res = clean_file(in_path, out_path)
+        self.assertTrue(res["success"])
+
+        with open(out_path, "r", encoding="utf-8") as f:
+            cleaned_code = f.read()
+        self.assertEqual(cleaned_code, "def hello():\n    print('Hello World')\n")
+
     def test_dispatcher_clean(self):
         in_path = os.path.join(self.test_dir, "auto.jpg")
         img = Image.new("RGB", (100, 100), color="yellow")
@@ -94,4 +152,3 @@ class TestCleaners(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

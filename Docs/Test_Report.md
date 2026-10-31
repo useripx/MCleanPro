@@ -4,7 +4,7 @@
 > **PROYEK:** MetaClean  
 > **PEMILIK PROYEK:** Yogi Ario  
 > **PENGUJI:** AI Agent (Pair Programmer)  
-> **TANGGAL PENGUJIAN:** 31/10/2026 21:27 WIB  
+> **TANGGAL PENGUJIAN:** 31/10/2026 22:00 WIB  
 > **BRANCH:** `develop`  
 > **PRINSIP UTAMA:** *No Evidence, No Completion. Dilarang menyatakan selesai sebelum terbukti 100% PASS.*
 
@@ -14,8 +14,8 @@
 
 | Metrik | Hasil Aktual | Kriteria Ambang (Threshold) | Status |
 | :--- | :---: | :---: | :---: |
-| **Total Test Cases** | **17** | Minimal 15 per fungsi kritis | `[LULUS]` |
-| **Passed (Lulus)** | **17** | 100% | `[LULUS]` |
+| **Total Test Cases** | **20** | Minimal 15 per fungsi kritis | `[LULUS]` |
+| **Passed (Lulus)** | **20** | 100% | `[LULUS]` |
 | **Failed (Gagal)** | **0** | **Wajib 0** | `[LULUS]` |
 | **Errors / Crashes** | **0** | **Wajib 0** | `[LULUS]` |
 | **Skipped** | **0** | 0 | `[LULUS]` |
@@ -34,26 +34,29 @@
 
 ## 3. Rincian Kasus Pengujian (Test Suite Breakdown)
 
-### 3.1 Scanner Berkas & Folder Batch
-- `test_get_file_category`: Mengklasifikasikan ekstensi berkas (Gambar, PDF, DOCX, Media, Teks). `[PASS]`
+### 3.1 Pembersihan Metadata & Steganografi (Cleaners)
+- `test_markdown_cleaner`: Pembersihan khusus berkas Markdown (`.md`) dengan steganografi `\uFE0F` (Variation Selector-16) dan Zero-Width Space. `[PASS]`
+- `test_html_cleaner`: Pembersihan berkas web HTML (`.html`) dari karakter tak terlihat. `[PASS]`
+- `test_code_cleaner`: Pembersihan berkas kode pemrograman Python (`.py`) tanpa merusak sintaks/indentasi. `[PASS]`
+- `test_image_cleaner`: Pembersihan EXIF *lossless* tanpa merusak dimensi & kualitas visual gambar. `[PASS]`
+- `test_pdf_cleaner`: Pengosongan menyeluruh metadata dokumen PDF hingga `Metadata: None`. `[PASS]`
+- `test_docx_cleaner`: Pembersihan seluruh core properties XML (Author, Revisions, Dates) pada dokumen Word. `[PASS]`
+- `test_dispatcher_clean`: Eksekusi pembersihan otomatis via dispatcher utama `clean_file()`. `[PASS]`
+
+### 3.2 Ekstraksi Metadata & Steganografi (Inspectors)
+- `test_image_inspector`: Ekstraksi EXIF Make, Model, Software dari gambar JPEG. `[PASS]`
+- `test_pdf_inspector`: Ekstraksi Author, Title, Producer dari dokumen PDF. `[PASS]`
+- `test_docx_inspector`: Ekstraksi Penulis dan Properti Dokumen Word (.docx). `[PASS]`
+- `test_text_inspector_with_invisible_watermark`: Deteksi karakter steganografi tak kasat mata (ZWSP, ZWJ, Variation Selectors). `[PASS]`
+- `test_dispatcher`: Pendeteksian dan dispatch inspektor otomatis per tipe berkas. `[PASS]`
+
+### 3.3 Scanner Berkas & Folder Batch
+- `test_get_file_category`: Mengklasifikasikan kategori (Image, PDF, DOCX, Media, Markdown, Coding, Text). `[PASS]`
 - `test_scan_single_file`: Pemindaian berkas individual. `[PASS]`
 - `test_scan_folder_recursive`: Pemindaian seluruh folder secara rekursif. `[PASS]`
 - `test_scan_folder_non_recursive`: Pemindaian folder flat (tanpa subfolder). `[PASS]`
 
-### 3.2 Ekstraksi Metadata (Inspectors)
-- `test_image_inspector`: Ekstraksi EXIF Make, Model, Software dari gambar JPEG. `[PASS]`
-- `test_pdf_inspector`: Ekstraksi Author, Title, Producer dari dokumen PDF. `[PASS]`
-- `test_docx_inspector`: Ekstraksi Penulis dan Properti Dokumen Word (.docx). `[PASS]`
-- `test_text_inspector_with_invisible_watermark`: Deteksi karakter steganografi tak kasat mata (ZWSP, ZWJ). `[PASS]`
-- `test_dispatcher`: Pendeteksian dan dispatch inspektor otomatis per tipe berkas. `[PASS]`
-
-### 3.3 Pembersihan Metadata (Cleaners)
-- `test_image_cleaner`: Pembersihan EXIF *lossless* tanpa merusak dimensi & kualitas gambar. `[PASS]`
-- `test_pdf_cleaner`: Pengosongan menyeluruh metadata dokumen PDF hingga `Metadata: None`. `[PASS]`
-- `test_docx_cleaner`: Pembersihan seluruh core properties XML (Author, Revisions, Dates) pada dokumen Word. `[PASS]`
-- `test_dispatcher_clean`: Eksekusi pembersihan otomatis via dispatcher utama. `[PASS]`
-
-### 3.4 Penghapusan AI Watermarks & Steganografi
+### 3.4 Penghapusan AI Watermarks
 - `test_clean_text_watermarks_string`: Pembersihan invisible unicode steganography pada string teks. `[PASS]`
 - `test_clean_file_text_watermarks`: Pembersihan berkas teks dan verifikasi hasil inspeksi 0 watermark. `[PASS]`
 
@@ -66,9 +69,12 @@
 ## 4. Bukti Log Eksekusi Terminal (Raw Output)
 
 ```text
+test_code_cleaner (test_cleaners.TestCleaners.test_code_cleaner) ... ok
 test_dispatcher_clean (test_cleaners.TestCleaners.test_dispatcher_clean) ... ok
 test_docx_cleaner (test_cleaners.TestCleaners.test_docx_cleaner) ... ok
+test_html_cleaner (test_cleaners.TestCleaners.test_html_cleaner) ... ok
 test_image_cleaner (test_cleaners.TestCleaners.test_image_cleaner) ... ok
+test_markdown_cleaner (test_cleaners.TestCleaners.test_markdown_cleaner) ... ok
 test_pdf_cleaner (test_cleaners.TestCleaners.test_pdf_cleaner) ... ok
 test_export_json (test_exporter.TestExporter.test_export_json) ... ok
 test_export_text (test_exporter.TestExporter.test_export_text) ... ok
@@ -85,7 +91,7 @@ test_clean_file_text_watermarks (test_watermarks.TestAIWatermarks.test_clean_fil
 test_clean_text_watermarks_string (test_watermarks.TestAIWatermarks.test_clean_text_watermarks_string) ... ok
 
 ----------------------------------------------------------------------
-Ran 17 tests in 0.288s
+Ran 20 tests in 0.452s
 
 OK
 ```
