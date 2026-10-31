@@ -94,3 +94,4 @@ class PdfEditor(BaseMetadataEditor):
                 "output_path": None,
                 "error": str(e)
             }
+

@@ -40,3 +40,4 @@
   - `Mrclean.exe` (salinan root direktori)
 - Ikon kustom dan logo window berbasis `Material/logo.jpg`.
 - Siap digunakan secara 100% offline tanpa dependensi eksternal.
+

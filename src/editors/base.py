@@ -24,3 +24,4 @@ class BaseMetadataEditor(ABC):
         Mengembalikan dict: {"success": bool, "output_path": str, "error": str}
         """
         pass
+

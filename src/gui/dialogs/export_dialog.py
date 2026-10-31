@@ -125,3 +125,4 @@ class ExportFormatDialog(ctk.CTkToplevel):
     def _on_submit(self):
         self.selected_format = self.var_format.get()
         self.destroy()
+

@@ -38,3 +38,4 @@ def is_editable_file(file_path: str) -> bool:
         return False
     ext = os.path.splitext(file_path)[1].lower()
     return ext in (IMAGE_EXTENSIONS | PDF_EXTENSIONS | DOCX_EXTENSIONS | MEDIA_EXTENSIONS)
+

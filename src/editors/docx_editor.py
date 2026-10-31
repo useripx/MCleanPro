@@ -77,3 +77,4 @@ class DocxEditor(BaseMetadataEditor):
                 "output_path": None,
                 "error": str(e)
             }
+

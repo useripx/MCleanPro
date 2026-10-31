@@ -134,3 +134,4 @@ class ImageEditor(BaseMetadataEditor):
                 "output_path": None,
                 "error": str(e)
             }
+

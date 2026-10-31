@@ -194,3 +194,4 @@ class MetadataEditDialog(ctk.CTkToplevel):
         else:
             err = res.get("error", "Terjadi kesalahan saat menyimpan perubahan.")
             messagebox.showerror("Gagal Menyimpan", f"Gagal memperbarui metadata:\n{err}", parent=self)
+
