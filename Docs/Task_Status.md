@@ -46,7 +46,7 @@
 
 ### 📌 Fase 5: Packaging Standalone .exe & Logo Baru
 - [x] Konversi `Material/logo.jpg` menjadi `assets/icon.ico` dan `assets/logo.png`.
-- [x] Kompilasi PyInstaller menghasilkan file tunggal portabel di `dist/MetaClean.exe` (35.92 MB) dengan ikon kustom `Material/logo.jpg`.
+- [x] Kompilasi PyInstaller menghasilkan file tunggal portabel di `dist/Mrclean.exe` dan salinan di root `Mrclean.exe` (35.92 MB) dengan ikon kustom `Material/logo.jpg`.
 - [x] Verifikasi berkas eksekutabel offline siap pakai.
 
 ---
