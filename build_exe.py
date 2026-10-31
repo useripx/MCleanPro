@@ -35,6 +35,7 @@ def build():
         "--name=Mrclean",
         f"--icon={ico_path}",
         "--collect-all=customtkinter",
+        "--collect-all=reportlab",
         "--add-data=assets;assets",
         "--clean",
         "-y",

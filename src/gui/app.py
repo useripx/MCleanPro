@@ -16,6 +16,11 @@ from src.inspectors import inspect_file
 from src.cleaners import clean_file
 from src.watermarks import AIWatermarkCleaner
 from src.utils.exporter import export_to_json, export_to_text
+from src.utils.md_exporter import MarkdownExporter
+from src.utils.pdf_exporter import PDFExporter
+from src.gui.dialogs.export_dialog import ExportFormatDialog
+from src.gui.dialogs.edit_dialog import MetadataEditDialog
+from src.editors import get_editor_for_file, is_editable_file
 
 # Pengaturan Default Tema
 ctk.set_appearance_mode("Dark")
@@ -197,6 +202,16 @@ class MetaCleanApp(ctk.CTk):
             command=self._clean_selected_file
         )
         self.btn_clean_selected.pack(side="left", padx=(15, 8), pady=12)
+
+        self.btn_edit_meta = ctk.CTkButton(
+            self.bottom_bar,
+            text="✏️ Edit Metadata",
+            fg_color="#0284c7",
+            hover_color="#0369a1",
+            font=ctk.CTkFont(weight="bold"),
+            command=self._edit_metadata
+        )
+        self.btn_edit_meta.pack(side="left", padx=8, pady=12)
 
         self.btn_clean_all = ctk.CTkButton(
             self.bottom_bar,
@@ -609,29 +624,86 @@ class MetaCleanApp(ctk.CTk):
         else:
             messagebox.showerror("Gagal", res.get("error", "Gagal menghapus watermark."))
 
+    def _edit_metadata(self):
+        if not self.selected_item:
+            messagebox.showinfo("Petunjuk", "Silakan pilih berkas di daftar yang ingin diedit metadatanya.")
+            return
+
+        file_path = self.selected_item.get("file_path")
+        if not file_path or not os.path.exists(file_path):
+            messagebox.showerror("Kesalahan", "Berkas tidak ditemukan.")
+            return
+
+        editor = get_editor_for_file(file_path)
+        if not editor:
+            messagebox.showinfo(
+                "Tidak Didukung",
+                "Format berkas ini belum mendukung penyuntingan metadata langsung.\n\nFormat yang didukung: Gambar (JPG/PNG/TIFF), Dokumen (PDF, Word DOCX), dan Media (MP3, MP4)."
+            )
+            return
+
+        dlg = MetadataEditDialog(self, file_path, editor)
+        self.wait_window(dlg)
+
+        if dlg.result and dlg.result.get("success"):
+            inplace = dlg.result.get("inplace", True)
+            target_path = file_path if inplace else dlg.result.get("output_path")
+            new_info = inspect_file(target_path)
+
+            if inplace:
+                for idx, it in enumerate(self.scanned_items):
+                    if it.get("file_path") == file_path:
+                        self.scanned_items[idx] = new_info
+                        break
+            else:
+                self.scanned_items.append(new_info)
+
+            self._refresh_file_list()
+            self._display_detail(new_info)
+
+            save_loc = "di tempat (berkas asli)" if inplace else f"sebagai salinan baru:\n{os.path.basename(target_path)}"
+            messagebox.showinfo("Berhasil", f"Metadata berhasil diperbarui {save_loc}!")
+
     def _export_report(self):
         if not self.scanned_items:
             messagebox.showinfo("Petunjuk", "Belum ada data metadata untuk diekspor.")
             return
 
-        save_path = filedialog.asksaveasfilename(
-            title="Simpan Laporan Metadata",
-            defaultextension=".json",
-            filetypes=[("Berkas JSON (*.json)", "*.json"), ("Laporan Teks (*.txt)", "*.txt")]
-        )
-        if not save_path:
+        dlg = ExportFormatDialog(self)
+        self.wait_window(dlg)
+
+        if not dlg.selected_format:
             return
 
-        ext = os.path.splitext(save_path)[1].lower()
-        if ext == ".txt":
-            ok = export_to_text(self.scanned_items, save_path)
-        else:
-            ok = export_to_json(self.scanned_items, save_path)
+        if dlg.selected_format == "pdf":
+            save_path = filedialog.asksaveasfilename(
+                title="Simpan Dokumen Laporan PDF",
+                defaultextension=".pdf",
+                filetypes=[("Dokumen PDF (*.pdf)", "*.pdf")]
+            )
+            if not save_path:
+                return
 
-        if ok:
-            messagebox.showinfo("Berhasil", f"Laporan metadata berhasil disimpan ke:\n{save_path}")
-        else:
-            messagebox.showerror("Gagal", "Gagal menyimpan berkas laporan.")
+            ok = PDFExporter.export(self.scanned_items, save_path)
+            if ok:
+                messagebox.showinfo("Berhasil", f"Laporan formal PDF berhasil disimpan ke:\n{save_path}")
+            else:
+                messagebox.showerror("Gagal", "Gagal menyimpan berkas laporan PDF.")
+
+        elif dlg.selected_format == "md":
+            save_path = filedialog.asksaveasfilename(
+                title="Simpan Laporan Markdown",
+                defaultextension=".md",
+                filetypes=[("Berkas Markdown (*.md)", "*.md")]
+            )
+            if not save_path:
+                return
+
+            ok = MarkdownExporter.export(self.scanned_items, save_path)
+            if ok:
+                messagebox.showinfo("Berhasil", f"Laporan Markdown berhasil disimpan ke:\n{save_path}")
+            else:
+                messagebox.showerror("Gagal", "Gagal menyimpan berkas laporan Markdown.")
 
 def main():
     app = MetaCleanApp()

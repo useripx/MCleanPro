@@ -15,6 +15,7 @@
 | **ADR-003** | 31/10/2026 | Integrasi AI Watermark Remover | Mengadopsi modul dari `guillaumemeyer/watermarks-remover` | `[APPROVED]` |
 | **ADR-004** | 31/10/2026 | Packaging & Branding | Membangun Standalone `.exe` dengan Ikon Kustom `img.png` | `[SUPERSEDED]` |
 | **ADR-005** | 31/10/2026 | Branding Baru & Dukungan File Coding | Menggunakan `Material/logo.jpg` & Menambahkan `TextCleaner` untuk Markdown dan Seluruh Bahasa Pemrograman | `[APPROVED]` |
+| **ADR-006** | 31/10/2026 | Ekspor PDF/MD & Editor Metadata Selektif | Modal Radio Button Ekspor (PDF/Markdown) & Engine Edit Metadata Parsial Preservative | `[APPROVED]` |
 
 ---
 
@@ -53,3 +54,14 @@
   1. Menggunakan `Material/logo.jpg` sebagai sumber utama ikon Windows `assets/icon.ico` dan menampilkan `assets/logo.png` pada header GUI aplikasi.
   2. Mengimplementasikan `TextCleaner` yang mencakup pembersihan steganografi AI (`\uFE0F`, zero-width spaces, joiners) pada file Markdown dan seluruh format coding, serta mendaftarkannya ke dispatcher utama `clean_file()`.
 - **Dampak:** Seluruh berkas teks dan koding dapat dibersihkan sekali klik baik secara per-file maupun batch satu folder.
+
+### ADR-006 — Dialog Ekspor Radio Button (PDF/Markdown) & Editor Metadata Preservative
+- **Status:** `[APPROVED]`
+- **Tanggal Usulan:** 31/10/2026
+- **Pengusul:** Yogi Ario (Project Owner)
+- **Penyetuju Resmi:** Yogi Ario (31/10/2026)
+- **Konteks:** Pengguna membutuhkan fleksibilitas saat mengekspor laporan (antara format PDF siap cetak berlogo vs format Markdown terstruktur untuk catatan/repo) melalui modal radio button, serta fitur penyuntingan atribut metadata tertentu (seperti mengganti Author saja) tanpa merusak atau mengubah metadata lain.
+- **Keputusan:**
+  1. Menyediakan `ExportFormatDialog` dengan pilihan radio button: `Dokumen PDF (.pdf)` via engine `PDFExporter` (`reportlab`) dan `Berkas Markdown (.md)` via `MarkdownExporter`.
+  2. Mengembangkan modul `src/editors/` (`ImageEditor`, `PdfEditor`, `DocxEditor`, `MediaEditor`) dan UI modal `MetadataEditDialog` yang menyuntikkan perubahan field selektif secara langsung (*In-Place*) atau sebagai salinan, dengan mempertahankan 100% tag metadata lainnya.
+- **Dampak:** Pengguna dapat mengganti Author dokumen/gambar tanpa merusak riwayat kamera/resolusi, serta bebas memilih format laporan analisis sesuai kebutuhan.

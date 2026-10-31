@@ -1,9 +1,9 @@
 # Task Status — MetaClean (Metadata & Watermark Remover Desktop)
 
-> **STATUS PROYEK KESELURUHAN:** `Completed (Ready for User Acceptance)`  
+> **STATUS PROYEK KESELURUHAN:** `Completed (v2.0 Ready)`  
 > **PROGRES GLOBAL:** `100%`  
 > **PEMILIK PROYEK:** Yogi Ario  
-> **TERAKHIR DIPERBARUI:** 31/10/2026 22:04 WIB  
+> **TERAKHIR DIPERBARUI:** 31/10/2026 22:58 WIB  
 
 ---
 
@@ -11,13 +11,13 @@
 
 | Fase | Nama Fase / Milestone | Bobot (%) | Status | Catatan Singkat |
 | :---: | :--- | :---: | :---: | :--- |
-| **Fase 1** | Setup Tata Kelola, Struktur Direktori & Aturan | 15% | `[COMPLETED]` | Git repo, .gitignore, Docs/, Material/ |
-| **Fase 2** | Desain Arsitektur & Perencanaan (Implementation Plan) | 15% | `[COMPLETED]` | Disetujui Mas Yogi Ario |
-| **Fase 3** | Implementasi Engine Inspektor, Cleaner & Watermark | 30% | `[COMPLETED]` | 20 Unit Tests PASS, 0 Gagal |
-| **Fase 4** | Implementasi GUI Desktop (CustomTkinter & Drag-Drop) | 20% | `[COMPLETED]` | Header Logo Baru, Dark/Light, Batch Scan |
-| **Fase 5** | Pembaruan Logo `Material/logo.jpg` & Pembersih Coding | 20% | `[COMPLETED]` | Sukses rebuild ke dist/Mrclean.exe (35.92 MB) |
-| **Fase 6** | Pembaruan v2.0: Ekspor PDF/Markdown & Editor Metadata | In-Plan | `[PENDING REVIEW]` | Menunggu persetujuan rencana implementasi Batch 5 |
-| **TOTAL** | | **100%** | **`100% (v1.0)`** | Versi 1.0 rilis stabil, v2.0 dalam tahap perencanaan |
+| **Fase 1** | Setup Tata Kelola, Struktur Direktori & Aturan | 10% | `[COMPLETED]` | Git repo, .gitignore, Docs/, Material/ |
+| **Fase 2** | Desain Arsitektur & Perencanaan (Implementation Plan) | 10% | `[COMPLETED]` | Disetujui Mas Yogi Ario |
+| **Fase 3** | Implementasi Engine Inspektor, Cleaner & Watermark | 25% | `[COMPLETED]` | 20 Unit Tests PASS, 0 Gagal |
+| **Fase 4** | Implementasi GUI Desktop (CustomTkinter & Drag-Drop) | 15% | `[COMPLETED]` | Header Logo Baru, Dark/Light, Batch Scan |
+| **Fase 5** | Pembaruan Logo `Material/logo.jpg` & Pembersih Coding | 20% | `[COMPLETED]` | Sukses rebuild ke dist/Mrclean.exe |
+| **Fase 6** | Pembaruan v2.0: Ekspor PDF/Markdown & Editor Metadata | 20% | `[COMPLETED]` | Radio button PDF/MD & Editor Selektif, 27 tests PASS (42.00 MB) |
+| **TOTAL** | | **100%** | **`100%`** | Seluruh fitur selesai, teruji 100% PASS, dan ter-package |
 
 ---
 
