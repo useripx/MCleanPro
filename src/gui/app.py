@@ -15,7 +15,6 @@ from src.utils.scanner import scan_files
 from src.inspectors import inspect_file
 from src.cleaners import clean_file
 from src.watermarks import AIWatermarkCleaner
-from src.utils.exporter import export_to_json, export_to_text
 from src.utils.md_exporter import MarkdownExporter
 from src.utils.pdf_exporter import PDFExporter
 from src.gui.dialogs.export_dialog import ExportFormatDialog
