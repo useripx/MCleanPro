@@ -31,3 +31,4 @@ Aplikasi desktop Windows mandiri (100% offline) untuk memeriksa metadata, member
 ## 🏛️ Tata Kelola & Aturan Kerja
 Proyek ini mengadopsi standar kerja ketat yang tercantum pada [`Docs/universal-rule.md`](Docs/universal-rule.md).
 Seluruh AI Agent dan pengembang wajib membaca dan mematuhi panduan tersebut.
+

@@ -236,3 +236,4 @@ Sebelum AI Agent melaporkan suatu tugas selesai kepada Yogi Ario, lakukan verifi
 - [ ] Apakah changelog bertimestamp (`changelog/changelog<jam><ampm><ddmmyyyy>.md`) sudah dibuat secara flat tanpa subfolder? (**Pilar 5**)
 - [ ] Apakah suite pengujian telah dijalankan dan terbukti **100% PASS**? (**Pilar 6**)
 - [ ] Apakah di akhir respons telah menanyakan pencadangan riwayat chat ke `Docs/chat/riwayat<ddmmyyyy>.md`? (**Pilar 8**)
+

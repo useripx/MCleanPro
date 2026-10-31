@@ -1,10 +1,10 @@
 # Implementation Plan — MetaClean: Offline Metadata Inspector, Cleaner & AI Watermarks Remover
 
-> **STATUS:** MENUNGGU PERSETUJUAN (APPROVAL GATE)  
+> **STATUS:** DISETUJUI (APPROVED)  
 > **PROYEK:** MetaClean  
 > **PEMILIK PROYEK:** Yogi Ario  
 > **PENYUSUN:** AI Agent (Pair Programmer)  
-> **TANGGAL:** 31/10/2026  
+> **TANGGAL PERSETUJUAN:** 31/10/2026  
 > **BRANCH TERKAIT:** `develop` & `feature/metaclean-core`  
 > **PRINSIP UTAMA:** *No Plan, No Code. No Approval, No Code. No Evidence, No Completion.*  
 
@@ -16,8 +16,8 @@
 Pengguna sering kali membagikan gambar, dokumen, atau teks di internet tanpa menyadari bahwa file tersebut menyimpan metadata sensitif (seperti lokasi GPS rumah, identitas kamera, nama asli penulis, software yang digunakan, dan tanggal pembuatan). Selain itu, teks dan media yang dihasilkan oleh kecerdasan buatan (ChatGPT, Claude, dsb.) sering disisipi *watermark* tersembunyi (*invisible zero-width unicode characters*, *C2PA provenance manifests*, dan *steganography*).
 
 Dibutuhkan sebuah aplikasi desktop Windows yang bekerja **100% offline** (tanpa koneksi internet, tanpa risiko kebocoran data) untuk:
-1. Memeriksa dan menganalisis metadata secara transparan.
-2. Membersihkan metadata identitas secara *lossless* (kualitas visual/audio tidak berkurang).
+1. Memeriksa dan menganalisis metadata secara transparan baik **per berkas (single file)** maupun **sekaligus dalam satu folder (batch folder scan)**.
+2. Membersihkan metadata identitas secara *lossless* (kualitas visual/audio tidak berkurang) untuk satu berkas atau seluruh isi folder.
 3. Mendeteksi dan menghapus tanda air tersembunyi AI (berbasis algoritma `guillaumemeyer/watermarks-remover`).
 4. Berjalan sebagai file eksekusi mandiri tunggal (`.exe`) dengan ikon kustom `Material/img.png`.
 
@@ -26,24 +26,28 @@ Menghasilkan aplikasi desktop Windows berbasis Python (CustomTkinter) yang dikem
 
 ### 1.3 Batasan Ruang Lingkup (In-Scope vs Out-of-Scope)
 - **Dalam Lingkup (In-Scope):**
+  - **Dukungan Pemrosesan File Tunggal & Folder Batch:**
+    - Tombol "Pilih Berkas" untuk analisis per file.
+    - Tombol "Pilih Folder" untuk memindai seluruh dokumen/gambar/media dalam satu folder (termasuk opsi subfolder).
+    - Drag-and-drop file tunggal, multi-file, maupun folder langsung ke jendela aplikasi.
   - **Inspeksi Metadata:**
     - Gambar: JPEG, PNG, WEBP, TIFF (EXIF tags, GPS, kamera, software, dimensi).
-    - Dokumen: PDF (Author, Creator, Producer, ModDate, CreationDate), DOCX/XLSX.
+    - Dokumen: PDF (Author, Creator, Producer, ModDate, CreationDate), DOCX (Word Core Properties), XLSX.
     - Audio & Video: MP3, MP4, WAV, MKV (ID3 metadata, encoder, bitrate, duration).
     - Teks: Karakter Unicode tak kasat mata (zero-width spaces, joiners, variation selectors).
   - **Pembersihan Metadata (Metadata Cleaner):**
     - Penghapusan seluruh tag EXIF/GPS/Device info pada gambar.
-    - Penghapusan author/history pada PDF dan dokumen.
+    - Penghapusan author/history pada PDF dan dokumen DOCX.
     - Pembersihan tag ID3/encoder pada media audio/video.
-    - Opsi simpan sebagai file baru (tanpa menimpa file asli) atau timpa dengan konfirmasi.
+    - Mode pembersihan: Simpan sebagai file baru (misal `namafile_clean.ext`) atau simpan ke folder tujuan output khusus.
   - **AI Watermarks & Provenance Removal (`watermarks-remover`):**
-    - Deteksi dan pembersihan steganografi Unicode teks AI.
+    - Deteksi dan pembersihan steganografi Unicode teks AI (zero-width characters, variation selectors).
     - Deteksi dan pembersihan segmen metadata C2PA pada berkas media.
   - **Antarmuka Desktop GUI:**
     - CustomTkinter dengan Dark/Light Mode.
-    - Area Drag-and-Drop file dan folder.
-    - Tabel inspeksi metadata yang interaktif dan dapat dicari/difilter.
-    - Tombol aksi: "Bersihkan Semua Metadata" dan "Hapus Watermark AI".
+    - Tabel antrean berkas (menampilkan nama, tipe, status metadata, status watermark).
+    - Panel inspeksi detail (key-value metadata per kategori).
+    - Tombol aksi batch: "Bersihkan Semua Berkas di Folder", "Hapus Watermark", dan "Ekspor Laporan Metadata (JSON/TXT)".
   - **Packaging:**
     - Skrip otomatisasi build PyInstaller menjadi berkas `.exe` portabel.
     - Konversi otomatis aset mentah `Material/img.png` menjadi format ikon Windows `assets/icon.ico`.
@@ -164,6 +168,9 @@ Menghasilkan aplikasi desktop Windows berbasis Python (CustomTkinter) yang dikem
 
 > 🛑 **Dilarang keras mengeksekusi kode aplikasi sebelum Yogi Ario memberikan persetujuan eksplisit terhadap rencana ini.**
 
-- [ ] Rencana telah ditinjau oleh Yogi Ario
-- [ ] Status Persetujuan: **MENUNGGU PERSETUJUAN**
-- [ ] Tanggal Persetujuan: `[Menunggu Persetujuan Mas Yogi]`
+- [x] Rencana telah ditinjau oleh Yogi Ario
+- [x] Status Persetujuan: **DISETUJUI (APPROVED)**
+- [x] Tanggal Persetujuan: `31/10/2026`
+- [x] Catatan Khusus dari Pemilik Proyek:
+  > *"Semua dokumen bisa dicek dalam 1 folder (batch) atau per-file, dikemas menjadi file .exe portabel dengan ikon kustom Material/img.png."*
+

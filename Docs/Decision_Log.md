@@ -47,3 +47,4 @@
 - **Penyetuju Resmi:** Yogi Ario (31/10/2026)
 - **Konteks:** Pengguna akhir menginginkan aplikasi praktis tanpa harus menginstal Python terlebih dahulu.
 - **Keputusan:** Menggunakan `PyInstaller` dalam mode `--windowed` (tanpa jendela command prompt hitam), dan mengonversi berkas `Material/img.png` menjadi format Windows `.ico` untuk ikon jendela dan ikon aplikasi `.exe`.
+
