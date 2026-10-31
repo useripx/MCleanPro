@@ -187,3 +187,48 @@ Menghasilkan aplikasi desktop Windows berbasis Python (CustomTkinter) yang dikem
   - Tanggal Persetujuan: `31/10/2026 21:56 WIB`
   - Catatan Pemilik Proyek: *"oke gas tambahkan bisa html, dll yang berformat coding"*
 
+---
+
+## 8. Rencana Implementasi Pembaruan Mendatang (Batch 5: Mrclean v2.0)
+
+> **STATUS:** DRAFT / MENUNGGU PERSETUJUAN (PENDING REVIEW)  
+> **FITUR TARGET:** Pilihan Format Ekspor Laporan (Radio Button: PDF vs Markdown) & Fitur Edit Metadata Interaktif
+
+### 8.1 Modul 1: Dialog Pilihan Format Ekspor Laporan (Radio Button)
+- **Tujuan:** Memberikan kemudahan bagi pengguna saat mengekspor laporan inspeksi berkas melalui dialog popup interaktif.
+- **Komponen UI:**
+  - Jendela modal popup CustomTkinter saat tombol *"💾 Ekspor Laporan..."* ditekan.
+  - Radio button group:
+    - `(•) Dokumen PDF (.pdf)`: Laporan formal siap cetak dengan kop/header logo resmi `Material/logo.jpg`, tabel ringkasan antrean berkas, dan kartu detail per berkas.
+    - `( ) Berkas Markdown (.md)`: Laporan terstruktur berformat GitHub-flavored Markdown dengan tabel dan badge status visual (`✅ Bersih`, `⚠️ Metadata`, `🤖 AI-WM`).
+  - Tombol aksi: `[ Batal ]` dan `[ Lanjutkan Ekspor ]`.
+- **Modul Backend:**
+  - `src/utils/md_exporter.py`: Engine penyusun teks laporan Markdown berformat rapi.
+  - `src/utils/pdf_exporter.py`: Engine penyusun dokumen PDF menggunakan pustaka `reportlab`.
+
+### 8.2 Modul 2: Fitur Edit Metadata Interaktif (Metadata Editor)
+- **Tujuan:** Memungkinkan pengguna menyunting nilai atribut metadata tertentu tanpa harus menghapus seluruh isi metadata.
+- **Cakupan Pengubahan per Format Berkas:**
+  - **Gambar (JPEG, PNG, TIFF):** Tag EXIF `Artist`, `ImageDescription / Title`, `Copyright`, `Software`, `DateTimeOriginal`.
+  - **Dokumen PDF:** Metadata dokumen `Author`, `Title`, `Subject`, `Keywords`, `Creator`.
+  - **Dokumen Word (.docx):** Properti inti `Author`, `Title`, `Subject`, `Keywords`, `Category`, `Comments`.
+  - **Media Audio/Video (MP3, MP4):** Tag ID3 `Title`, `Artist`, `Album`, `Year`, `Genre`.
+- **Komponen UI:**
+  - Tombol baru *"✏️ Edit Metadata"* di panel kontrol bawah aplikasi.
+  - Jendela form modal yang dinamis menampilkan input teks sesuai field metadata yang relevan dengan tipe berkas terpilih.
+  - Opsi penyimpanan: Simpan langsung di tempat (*In-Place*) atau simpan sebagai salinan (*Copy*).
+  - Refresh otomatis pada daftar berkas dan panel detail setelah penyimpanan berhasil.
+- **Modul Backend:**
+  - `src/editors/base.py` & `src/editors/__init__.py`: Interface dan dispatcher editor.
+  - `src/editors/image_editor.py`, `pdf_editor.py`, `docx_editor.py`, `media_editor.py`.
+
+### 8.3 Rencana Verifikasi Pengujian (100% PASS Gate)
+- Kasus uji unit test baru pada `tests/test_editors.py`, `tests/test_md_exporter.py`, dan `tests/test_pdf_exporter.py`.
+- Wajib lulus 100% PASS (0 GAGAL / 0 ERROR) sebelum pengemasan executable `.exe`.
+
+### 8.4 Gerbang Persetujuan Batch 5
+- [ ] Modul 1 (Ekspor Radio Button: PDF vs Markdown) Disetujui Mas Yogi Ario
+- [ ] Modul 2 (Editor Metadata Interaktif) Disetujui Mas Yogi Ario
+- [ ] Izin Eksekusi Pengkodean Diberikan Mas Yogi Ario
+
+
