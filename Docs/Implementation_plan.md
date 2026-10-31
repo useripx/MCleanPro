@@ -1,0 +1,169 @@
+# Implementation Plan — MetaClean: Offline Metadata Inspector, Cleaner & AI Watermarks Remover
+
+> **STATUS:** MENUNGGU PERSETUJUAN (APPROVAL GATE)  
+> **PROYEK:** MetaClean  
+> **PEMILIK PROYEK:** Yogi Ario  
+> **PENYUSUN:** AI Agent (Pair Programmer)  
+> **TANGGAL:** 31/10/2026  
+> **BRANCH TERKAIT:** `develop` & `feature/metaclean-core`  
+> **PRINSIP UTAMA:** *No Plan, No Code. No Approval, No Code. No Evidence, No Completion.*  
+
+---
+
+## 1. Ringkasan & Ruang Lingkup
+
+### 1.1 Masalah / Latar Belakang
+Pengguna sering kali membagikan gambar, dokumen, atau teks di internet tanpa menyadari bahwa file tersebut menyimpan metadata sensitif (seperti lokasi GPS rumah, identitas kamera, nama asli penulis, software yang digunakan, dan tanggal pembuatan). Selain itu, teks dan media yang dihasilkan oleh kecerdasan buatan (ChatGPT, Claude, dsb.) sering disisipi *watermark* tersembunyi (*invisible zero-width unicode characters*, *C2PA provenance manifests*, dan *steganography*).
+
+Dibutuhkan sebuah aplikasi desktop Windows yang bekerja **100% offline** (tanpa koneksi internet, tanpa risiko kebocoran data) untuk:
+1. Memeriksa dan menganalisis metadata secara transparan.
+2. Membersihkan metadata identitas secara *lossless* (kualitas visual/audio tidak berkurang).
+3. Mendeteksi dan menghapus tanda air tersembunyi AI (berbasis algoritma `guillaumemeyer/watermarks-remover`).
+4. Berjalan sebagai file eksekusi mandiri tunggal (`.exe`) dengan ikon kustom `Material/img.png`.
+
+### 1.2 Tujuan
+Menghasilkan aplikasi desktop Windows berbasis Python (CustomTkinter) yang dikemas menjadi satu file eksekusi `.exe` portabel, responsif, modern, dan lulus uji otomatis 100% PASS.
+
+### 1.3 Batasan Ruang Lingkup (In-Scope vs Out-of-Scope)
+- **Dalam Lingkup (In-Scope):**
+  - **Inspeksi Metadata:**
+    - Gambar: JPEG, PNG, WEBP, TIFF (EXIF tags, GPS, kamera, software, dimensi).
+    - Dokumen: PDF (Author, Creator, Producer, ModDate, CreationDate), DOCX/XLSX.
+    - Audio & Video: MP3, MP4, WAV, MKV (ID3 metadata, encoder, bitrate, duration).
+    - Teks: Karakter Unicode tak kasat mata (zero-width spaces, joiners, variation selectors).
+  - **Pembersihan Metadata (Metadata Cleaner):**
+    - Penghapusan seluruh tag EXIF/GPS/Device info pada gambar.
+    - Penghapusan author/history pada PDF dan dokumen.
+    - Pembersihan tag ID3/encoder pada media audio/video.
+    - Opsi simpan sebagai file baru (tanpa menimpa file asli) atau timpa dengan konfirmasi.
+  - **AI Watermarks & Provenance Removal (`watermarks-remover`):**
+    - Deteksi dan pembersihan steganografi Unicode teks AI.
+    - Deteksi dan pembersihan segmen metadata C2PA pada berkas media.
+  - **Antarmuka Desktop GUI:**
+    - CustomTkinter dengan Dark/Light Mode.
+    - Area Drag-and-Drop file dan folder.
+    - Tabel inspeksi metadata yang interaktif dan dapat dicari/difilter.
+    - Tombol aksi: "Bersihkan Semua Metadata" dan "Hapus Watermark AI".
+  - **Packaging:**
+    - Skrip otomatisasi build PyInstaller menjadi berkas `.exe` portabel.
+    - Konversi otomatis aset mentah `Material/img.png` menjadi format ikon Windows `assets/icon.ico`.
+- **Di Luar Lingkup (Out-of-Scope):**
+  - Koneksi ke server cloud / online API (Aplikasi murni offline).
+  - Editing konten isi foto (seperti inpainting / crop visual gambar) — fokus pada metadata dan watermark steganografi.
+
+---
+
+## 2. Analisis Kondisi Saat Ini & Pilihan Solusi
+
+### 2.1 Kondisi & Dependensi
+- **Runtime:** Python 3.13.0 terpasang di sistem (`C:\laragon\bin\python\python-3.13`).
+- **Aset:** `Material/img.png` (berkas mentah yang disediakan Mas Yogi Ario, terlindungi status READ-ONLY).
+- **Pustaka Python Terpilih:**
+  - `customtkinter`: GUI modern native look.
+  - `Pillow`: Pengolahan gambar, ekstraksi EXIF, pembersihan tag gambar, dan konversi ikon `img.png` ke `.ico`.
+  - `pypdf`: Ekstraksi dan sanitasi metadata PDF.
+  - `mutagen`: Ekstraksi dan sanitasi metadata audio dan video.
+  - `pyinstaller`: Pengemasan aplikasi menjadi `.exe`.
+
+### 2.2 Pilihan Pendekatan Solusi (Trade-off Analysis)
+
+#### Opsi A: Integrasi Core Standalone + CustomTkinter + PyInstaller (Direkomendasikan)
+- **Kelebihan:** 
+  - Tidak ada dependensi server lokal.
+  - Sangat cepat, ukuran file wajar, performa native di Windows 10/11.
+  - Modul engine (Inspector/Cleaner/Watermark) dibuat terpisah murni (Python standard + library ringan), sehingga sangat mudah diuji menggunakan `unittest` (100% PASS Gate).
+- **Kekurangan:** Perlu penanganan kompatibilitas PyInstaller untuk CustomTkinter assets.
+- **Mitigasi:** Telah disiapkan skrip build `build_exe.py` yang otomatis menyertakan folder tema CustomTkinter dan file ikon.
+
+---
+
+## 3. Daftar Berkas Target
+
+### Berkas yang Akan Dibuat Baru:
+1. `requirements.txt` — Daftar dependensi Python resmi.
+2. `src/__init__.py`
+3. `src/utils/icon_converter.py` — Pengonversi `Material/img.png` ke `assets/icon.ico`.
+4. `src/inspectors/__init__.py`
+5. `src/inspectors/base.py` — Base class inspector.
+6. `src/inspectors/image_inspector.py` — Inspektor EXIF/GPS/Kamera.
+7. `src/inspectors/pdf_inspector.py` — Inspektor PDF metadata.
+8. `src/inspectors/audio_video_inspector.py` — Inspektor audio/video tags.
+9. `src/inspectors/text_inspector.py` — Inspektor teks & invisible Unicode.
+10. `src/cleaners/__init__.py`
+11. `src/cleaners/base.py` — Base class cleaner.
+12. `src/cleaners/image_cleaner.py` — Pembersih EXIF *lossless*.
+13. `src/cleaners/pdf_cleaner.py` — Pembersih PDF metadata.
+14. `src/cleaners/media_cleaner.py` — Pembersih media audio/video.
+15. `src/watermarks/__init__.py`
+16. `src/watermarks/ai_cleaner.py` — Pembersih invisible Unicode & C2PA provenance (dari `watermarks-remover`).
+17. `src/gui/__init__.py`
+18. `src/gui/app.py` — Jendela utama CustomTkinter, drag-and-drop, tab inspector & cleaner.
+19. `src/main.py` — Entry point utama aplikasi.
+20. `build_exe.py` — Skrip build PyInstaller otomatis dengan ikon kustom `icon.ico`.
+21. `tests/test_inspectors.py` — Unit test ekstraksi metadata.
+22. `tests/test_cleaners.py` — Unit test pembersihan metadata.
+23. `tests/test_watermarks.py` — Unit test pembersihan AI watermark.
+
+### Berkas yang Dilindungi (READ-ONLY):
+- `Material/img.png` — Dilarang diubah/dihapus.
+
+---
+
+## 4. Rencana Tahapan Implementasi (Batching)
+
+### 📦 Batch 1: Fondasi Modul Engine & Automated Tests (100% PASS Gate)
+- [ ] Buat file `requirements.txt`.
+- [ ] Implementasikan `src/inspectors/` (Image, PDF, Media, Text).
+- [ ] Implementasikan `src/cleaners/` (Image, PDF, Media).
+- [ ] Implementasikan `src/watermarks/` (AI text steganography & C2PA cleaner).
+- [ ] Buat suite pengujian lengkap di `tests/` dan jalankan hingga menghasilkan **100% PASS (0 GAGAL / 0 ERROR)**.
+- [ ] Perbarui `Docs/Test_Report.md`.
+
+### 📦 Batch 2: Antarmuka Desktop GUI (CustomTkinter)
+- [ ] Konversi `Material/img.png` ke `assets/icon.ico` menggunakan skrip utilitas.
+- [ ] Implementasikan `src/gui/app.py` dengan komponen:
+  - Header & Status Bar.
+  - Zona Drop File / Tombol Pilih Berkas & Folder.
+  - Tabel Daftar Berkas & Pratinjau Metadata.
+  - Tombol Aksi: "Bersihkan Metadata Terpilih", "Hapus Watermark AI", "Bersihkan Semua".
+- [ ] Integrasikan GUI dengan modul engine dari Batch 1.
+- [ ] Uji fungsionalitas GUI dan penanganan error file korup.
+
+### 📦 Batch 3: Packaging Standalone Executable (.exe) & Rilis
+- [ ] Buat skrip `build_exe.py` untuk menjalankan PyInstaller dengan flag `--windowed --onefile --icon=assets/icon.ico`.
+- [ ] Eksekusi proses build dan verifikasi hasil di `dist/MetaClean.exe`.
+- [ ] Verifikasi bahwa `.exe` dapat dibuka secara mandiri, ikon `img.png` tampil pada taskbar & jendela aplikasi, serta seluruh fitur bekerja 100% offline.
+- [ ] Catat changelog final di `changelog/`.
+
+---
+
+## 5. Rencana Pengujian & Kriteria Keberhasilan (100% PASS Gate)
+
+### 5.1 Pengujian Otomatis
+- **Perintah:** `python -m unittest discover -s tests -p "*_test.py"`
+- **Kasus Uji:**
+  1. `test_image_exif_extraction`: Membaca EXIF gambar sampel.
+  2. `test_image_cleaner_lossless`: Memastikan seluruh EXIF hilang dan dimensi/data gambar tetap utuh.
+  3. `test_pdf_metadata_extraction_and_cleaning`: Membaca dan menghapus author/modDate PDF.
+  4. `test_ai_unicode_watermark_removal`: Menghapus invisible characters (`\u200b`, `\u200d`, dsb.) dari string teks tanpa mengubah kata asli.
+  5. `test_c2pa_manifest_removal`: Mendeteksi dan membersihkan struktur C2PA.
+- **Kriteria Kelulusan:** `100% PASS (0 GAGAL / 0 ERROR)`.
+
+---
+
+## 6. Analisis Risiko & Mitigasi
+
+- **Risiko 1: Kerusakan File Asli Saat Pembersihan:**
+  - *Mitigasi:* Secara default, aplikasi selalu menyimpan file hasil pembersihan sebagai file baru (contoh: `namafile_clean.jpg`) di folder yang sama atau folder output pilihan pengguna. File asli tidak pernah diubah tanpa izin pengguna.
+- **Risiko 2: Windows Defender False-Positive pada Executable Baru:**
+  - *Mitigasi:* Menggunakan PyInstaller resmi dari virtual environment bersih tanpa library mencurigakan dan menyertakan manifest aplikasi yang valid.
+
+---
+
+## 7. Gerbang Persetujuan (Approval Gate)
+
+> 🛑 **Dilarang keras mengeksekusi kode aplikasi sebelum Yogi Ario memberikan persetujuan eksplisit terhadap rencana ini.**
+
+- [ ] Rencana telah ditinjau oleh Yogi Ario
+- [ ] Status Persetujuan: **MENUNGGU PERSETUJUAN**
+- [ ] Tanggal Persetujuan: `[Menunggu Persetujuan Mas Yogi]`
