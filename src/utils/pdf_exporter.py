@@ -193,6 +193,7 @@ class PDFExporter:
                 Paragraph("<b>Nama Berkas</b>", table_head),
                 Paragraph("<b>Kategori</b>", table_head),
                 Paragraph("<b>Ukuran</b>", table_head),
+                Paragraph("<b>Risiko Privasi</b>", table_head),
                 Paragraph("<b>Status Metadata</b>", table_head),
                 Paragraph("<b>Status AI-WM</b>", table_head)
             ]]
@@ -206,16 +207,26 @@ class PDFExporter:
                 meta_str = "⚠️ Metadata" if it.get("has_metadata") else "✅ Bersih"
                 wm_str = "🤖 AI-WM" if it.get("has_ai_watermark") else "✅ Bersih"
 
+                risk = it.get("risk_assessment")
+                if not risk:
+                    from src.inspectors.risk_scorer import calculate_privacy_risk
+                    risk = calculate_privacy_risk(it)
+                r_score = risk.get("score", 0)
+                r_lvl = risk.get("level", "AMAN")
+                r_color = "#b91c1c" if r_lvl == "KRITIS" else ("#d97706" if r_lvl == "SEDANG" else "#15803d")
+                risk_p = Paragraph(f"<font color='{r_color}'><b>{r_score}% {r_lvl}</b></font>", table_cell)
+
                 overview_data.append([
                     Paragraph(str(idx), table_cell),
                     Paragraph(name, table_cell),
                     Paragraph(cat, table_cell),
                     Paragraph(sz_str, table_cell),
+                    risk_p,
                     Paragraph(meta_str, table_cell),
                     Paragraph(wm_str, table_cell)
                 ])
 
-            ov_table = Table(overview_data, colWidths=[25, 200, 70, 65, 80, 80])
+            ov_table = Table(overview_data, colWidths=[20, 160, 60, 55, 75, 75, 75])
             ov_table.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
                 ('ALIGN', (0, 0), (0, -1), 'CENTER'),
@@ -238,7 +249,15 @@ class PDFExporter:
                 cat = it.get("category", "-").upper()
                 sz_kb = it.get("file_size", 0) / 1024
 
-                title_p = Paragraph(f"<b>{idx}. {name}</b> ({cat} | {sz_kb:.1f} KB)", ParagraphStyle(
+                risk = it.get("risk_assessment")
+                if not risk:
+                    from src.inspectors.risk_scorer import calculate_privacy_risk
+                    risk = calculate_privacy_risk(it)
+                r_score = risk.get("score", 0)
+                r_lvl = risk.get("level", "AMAN")
+                r_color = "#b91c1c" if r_lvl == "KRITIS" else ("#d97706" if r_lvl == "SEDANG" else "#15803d")
+
+                title_p = Paragraph(f"<b>{idx}. {name}</b> ({cat} | {sz_kb:.1f} KB | <font color='{r_color}'><b>{r_score}% {r_lvl}</b></font>)", ParagraphStyle(
                     'ItemTitle', parent=styles['Heading3'], fontSize=10, textColor=colors.HexColor("#1e40af"), spaceBefore=6, spaceAfter=2
                 ))
                 path_p = Paragraph(f"Lokasi: {path}", ParagraphStyle(

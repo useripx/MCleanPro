@@ -49,8 +49,8 @@ class MarkdownExporter:
             lines.append("")
             lines.append("## 📋 2. Tabel Ikhtisar Berkas")
             lines.append("")
-            lines.append("| No | Nama Berkas | Kategori | Ukuran | Status Metadata | Status Watermark AI |")
-            lines.append("| :-: | :--- | :---: | :-: | :---: | :---: |")
+            lines.append("| No | Nama Berkas | Kategori | Ukuran | Risiko Privasi | Status Metadata | Status Watermark AI |")
+            lines.append("| :-: | :--- | :---: | :-: | :---: | :---: | :---: |")
 
             for idx, it in enumerate(scanned_items, start=1):
                 name = it.get("file_name", "Unknown")
@@ -60,8 +60,17 @@ class MarkdownExporter:
                 
                 meta_badge = "⚠️ Metadata" if it.get("has_metadata") else "✅ Bersih"
                 wm_badge = "🤖 AI-WM" if it.get("has_ai_watermark") else "✅ Bersih"
+
+                risk = it.get("risk_assessment")
+                if not risk:
+                    from src.inspectors.risk_scorer import calculate_privacy_risk
+                    risk = calculate_privacy_risk(it)
+                r_score = risk.get("score", 0)
+                r_lvl = risk.get("level", "AMAN")
+                r_icon = "🔴" if r_lvl == "KRITIS" else ("🟡" if r_lvl == "SEDANG" else "🟢")
+                r_badge = f"{r_icon} {r_score}% {r_lvl}"
                 
-                lines.append(f"| {idx} | `{name}` | {cat} | {sz_str} | {meta_badge} | {wm_badge} |")
+                lines.append(f"| {idx} | `{name}` | {cat} | {sz_str} | {r_badge} | {meta_badge} | {wm_badge} |")
 
             lines.append("")
             lines.append("---")
@@ -74,10 +83,20 @@ class MarkdownExporter:
                 path = it.get("file_path", "-")
                 cat = it.get("category", "-").upper()
                 sz_kb = it.get("file_size", 0) / 1024
+
+                risk = it.get("risk_assessment")
+                if not risk:
+                    from src.inspectors.risk_scorer import calculate_privacy_risk
+                    risk = calculate_privacy_risk(it)
+                r_score = risk.get("score", 0)
+                r_lvl = risk.get("level", "AMAN")
+                r_icon = "🔴" if r_lvl == "KRITIS" else ("🟡" if r_lvl == "SEDANG" else "🟢")
+                r_badge = f"{r_icon} {r_score}% {r_lvl}"
                 
                 lines.append(f"### 📄 {idx}. {name}")
                 lines.append(f"- **Lokasi Berkas:** `{path}`")
-                lines.append(f"- **Kategori:** `{cat}` | **Ukuran:** `{sz_kb:.1f} KB`")
+                lines.append(f"- **Kategori:** `{cat}` | **Ukuran:** `{sz_kb:.1f} KB` | **Risiko Privasi:** {r_badge}")
+                lines.append(f"- **Evaluasi Keamanan:** {risk.get('recommendation', '')}")
                 lines.append("")
 
                 if it.get("has_ai_watermark"):

@@ -287,8 +287,61 @@ Saat ini pengguna hanya dapat memilih satu per satu berkas (*single select*) unt
 - Menjalankan seluruh test suite yang ada (27 tests) ditambah kasus uji baru untuk memastikan tidak ada regresi dan hasil pengujian **100% PASS (0 GAGAL / 0 ERROR)**.
 
 ### 9.5 Gerbang Persetujuan (Approval Gate)
-- [ ] Rencana Fitur Pemilihan Multi-Berkas Disetujui Mas Yogi Ario
-- [ ] Izin Eksekusi Pengkodean pada Branch `fix/select-item` Diberikan Mas Yogi Ario
+- [x] Rencana Fitur Pemilihan Multi-Berkas Disetujui Mas Yogi Ario
+- [x] Izin Eksekusi Pengkodean pada Branch `fix/select-item` Diberikan Mas Yogi Ario
+- [x] Verifikasi 29 Kasus Uji Otomatis: **100% PASS (0 GAGAL / 0 ERROR)**
+- [x] Re-Packaging Executable: Berhasil dikompilasi ke `dist/Mrclean.exe` & `Mrclean.exe` (42.00 MB)
+- [x] Berhasil di-merge ke branch `develop` (Pull Request #1)
+
+---
+
+## 10. Rencana Implementasi Branch `fix/majorupdatev1` (Major Update v1 & Kebijakan Kebersihan Branch `main`)
+
+> **STATUS:** DRAFT UNTUK DITINJAU & DISETUJUI  
+> **PROYEK:** Mrclean (MCleanPro)  
+> **PEMILIK PROYEK:** Yogi Ario  
+> **BRANCH:** `fix/majorupdatev1`  
+> **TANGGAL:** 09 November 2026  
+> **TIGA PRINSIP UTAMA:**  
+> 1. *No Plan, No Code.*  
+> 2. *No Approval, No Code.*  
+> 3. *No Evidence, No Completion.*  
+
+### 10.1 Kebijakan Kebersihan Branch `main` (Production-Only Repository)
+Sesuai arahan Mas Yogi Ario, branch `main` **WAJIB BERSIH** hanya memuat berkas-berkas esensial aplikasi (Production-Ready):
+- **Diperbolehkan di `main`:** `src/`, `assets/`, `Material/`, `requirements.txt`, `README.md`, `LICENSE`, `build_exe.py`.
+- **Dilarang di `main` (Hanya sampai `develop`):** `Docs/` (Task Status, Decision Log, Plans, Chat Logs, Mac), `changelog/`, `AGENTS.md`, `GEMINI.md`.
+- **Mekanisme Eksekusi:** Menyiapkan skrip rilis otomatis `tools/sync_to_main.py` yang otomatis mengisolasi dan memangkas folder catatan pengembangan saat perilisan ke `main`.
+
+### 10.2 Rincian Fitur Utama yang Dikembangkan
+1. **🛡️ Privacy Risk Scoring Engine (0–100%) & Visual Badges:**
+   - Mesin pembobot kerentanan privasi (`src/inspectors/risk_scorer.py`).
+   - Tingkat bahaya: 🔴 KRITIS (≥70%), 🟡 SEDANG (30–69%), 🟢 AMAN (0–29%).
+   - Tampilan visual bar di panel detail, badge warna di daftar antrean, dan kolom skor pada laporan ekspor PDF & Markdown.
+2. **⚡ Quick Clean Presets (Pembersihan Cepat Berbasis Profil):**
+   - Modul `src/cleaners/preset_cleaner.py` dengan preset: Media Sosial (jaga orientasi & sRGB), Akademik/Jurnal (bersihkan author & steganografi AI), dan Developer/OSS (bersihkan header & path lokal).
+3. **🤖 AI Generative & C2PA Forensics (Prompt Viewer & Stripper):**
+   - Deteksi prompt Midjourney, Stable Diffusion, DALL-E, dan manifes C2PA Adobe (`src/inspectors/ai_forensics.py`).
+   - Tombol pembersih khusus C2PA & Prompt AI (`src/cleaners/c2pa_cleaner.py`).
+4. **🎭 Metadata Spoofing & Anonymizer (Generator Metadata Palsu):**
+   - Modul `src/editors/spoofing.py` untuk menginjeksi metadata sintetis acak dan wajar agar berkas tidak dicurigai sistem *exif-stripper detection*.
+5. **🖱️ Integrasi Klik Kanan Windows Explorer (Shell Context Menu):**
+   - Modul `src/utils/shell_integration.py` yang mendaftarkan shortcut pembersihan langsung di menu klik kanan Windows Explorer (beroperasi 100% pada `HKCU` tanpa butuh akses Administrator).
+
+### 10.3 Tahapan Pengerjaan Bertahap (Execution Batches)
+- **Batch 1:** Engine Privacy Risk Scoring + Integrasi UI & Exporters + Unit Test.
+- **Batch 2:** Quick Clean Presets Engine + UI Toolbar + Unit Test.
+- **Batch 3:** AI Generative & C2PA Forensics + Prompt Viewer + Unit Test.
+- **Batch 4:** Metadata Spoofing & Anonymizer + Dialog GUI + Unit Test.
+- **Batch 5:** Integrasi Klik Kanan Windows Explorer (HKCU) + Unit Test.
+- **Batch 6:** Setup Skrip Rilis Bersih Branch `main` (`tools/sync_to_main.py`).
+- **Batch 7:** Verifikasi Pengujian Otomatis 100% PASS Gate & Build `dist/Mrclean.exe`.
+
+### 10.4 Gerbang Persetujuan (Approval Gate)
+- [ ] Rencana Implementasi Major Update v1 Disetujui Mas Yogi Ario
+- [ ] Kebijakan Kebersihan Branch `main` Disetujui Mas Yogi Ario
+- [ ] Izin Eksekusi Pengkodean pada Branch `fix/majorupdatev1` Diberikan Mas Yogi Ario
+
 
 
 
