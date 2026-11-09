@@ -12,10 +12,21 @@ from src.utils.icon_converter import convert_logo_to_assets
 if sys.stdout.encoding != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
+def kill_existing_mrclean():
+    """Menghentikan proses Mrclean.exe lama jika sedang aktif agar tidak mengunci file."""
+    if sys.platform == "win32":
+        try:
+            subprocess.run(["taskkill", "/F", "/IM", "Mrclean.exe"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception:
+            pass
+
 def build():
     print("=" * 60)
     print("[*] MEMULAI PROSES BUILD MRCLEAN KE STANDALONE .EXE")
     print("=" * 60)
+
+    # Pastikan tidak ada proses lama yang mengunci file
+    kill_existing_mrclean()
 
     # 1. Pastikan icon.ico dan logo.png terbuat dari Material/logo.jpg
     res = convert_logo_to_assets(
@@ -54,7 +65,11 @@ def build():
             size_mb = os.path.getsize(exe_path) / (1024 * 1024)
             # Salin juga ke root direktori agar mudah diakses
             root_copy = os.path.abspath("Mrclean.exe")
-            shutil.copy2(exe_path, root_copy)
+            try:
+                shutil.copy2(exe_path, root_copy)
+            except PermissionError:
+                kill_existing_mrclean()
+                shutil.copy2(exe_path, root_copy)
 
             print("=" * 60)
             print("[SUCCESS] BUILD BERHASIL 100%!")
