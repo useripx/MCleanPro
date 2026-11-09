@@ -20,6 +20,10 @@ from src.utils.pdf_exporter import PDFExporter
 from src.gui.dialogs.export_dialog import ExportFormatDialog
 from src.gui.dialogs.edit_dialog import MetadataEditDialog
 from src.editors import get_editor_for_file, is_editable_file
+from src.cleaners.preset_cleaner import PresetCleaner
+from src.cleaners.c2pa_cleaner import C2PACleaner
+from src.editors.spoofing import MetadataSpoofer
+from src.utils.shell_integration import WindowsShellIntegration
 
 # Pengaturan Default Tema
 ctk.set_appearance_mode("Dark")
@@ -108,7 +112,21 @@ class MetaCleanApp(ctk.CTk):
             command=self._toggle_theme
         )
         self.theme_switch.select()
-        self.theme_switch.pack(side="right", padx=20, pady=12)
+        self.theme_switch.pack(side="right", padx=15, pady=12)
+
+        # Windows Explorer Context Menu Toggle Button
+        self.btn_shell = ctk.CTkButton(
+            self.header_frame,
+            text="⚙️ Menu Klik Kanan",
+            width=135,
+            height=28,
+            fg_color="#334155",
+            hover_color="#1e293b",
+            font=ctk.CTkFont(size=11),
+            command=self._toggle_shell_integration
+        )
+        self.btn_shell.pack(side="right", padx=10, pady=12)
+        self._update_shell_button_text()
 
         # 2. Control & Action Bar (Pilih Berkas / Folder)
         self.control_frame = ctk.CTkFrame(self, corner_radius=8)
@@ -261,6 +279,26 @@ class MetaCleanApp(ctk.CTk):
             command=self._clean_ai_watermarks
         )
         self.btn_clean_ai.pack(side="left", padx=8, pady=12)
+
+        self.btn_spoof = ctk.CTkButton(
+            self.bottom_bar,
+            text="🎭 Samarkan (Spoof)",
+            fg_color="#00897b",
+            hover_color="#00695c",
+            font=ctk.CTkFont(weight="bold"),
+            command=self._spoof_metadata_action
+        )
+        self.btn_spoof.pack(side="left", padx=8, pady=12)
+
+        self.preset_var = ctk.StringVar(value="⚡ Profil Cepat...")
+        self.opt_preset = ctk.CTkOptionMenu(
+            self.bottom_bar,
+            values=["⚡ Profil Cepat...", "📱 Media Sosial", "🎓 Akademik", "💻 Developer/OSS"],
+            variable=self.preset_var,
+            width=140,
+            command=self._apply_preset_action
+        )
+        self.opt_preset.pack(side="left", padx=8, pady=12)
 
         self.btn_export = ctk.CTkButton(
             self.bottom_bar,
@@ -452,6 +490,21 @@ class MetaCleanApp(ctk.CTk):
                 )
                 clean_badge.pack(side="right", padx=4)
 
+            # Privacy Risk Badge
+            risk = item.get("risk_assessment") or {}
+            risk_score = risk.get("score", 0)
+            risk_level = risk.get("level", "AMAN")
+            risk_color = risk.get("color", "#43a047")
+            r_icon = "🔴" if risk_level == "KRITIS" else ("🟡" if risk_level == "SEDANG" else "🟢")
+
+            risk_badge = ctk.CTkLabel(
+                item_frame,
+                text=f"{r_icon} {risk_score}%",
+                font=ctk.CTkFont(size=10, weight="bold"),
+                text_color=risk_color
+            )
+            risk_badge.pack(side="right", padx=(4, 6))
+
         self._update_selection_counter()
 
     def _on_item_click(self, item):
@@ -537,6 +590,54 @@ class MetaCleanApp(ctk.CTk):
             text_color="gray"
         ).pack(anchor="w", padx=12, pady=(2, 10))
 
+        # Privacy Risk Assessment Card
+        risk = item.get("risk_assessment") or {}
+        risk_score = risk.get("score", 0)
+        risk_level = risk.get("level", "AMAN")
+        risk_color = risk.get("color", "#43a047")
+        risk_reasons = risk.get("reasons", [])
+        risk_rec = risk.get("recommendation", "")
+
+        risk_card = ctk.CTkFrame(self.detail_scroll, corner_radius=8, fg_color="#18181b")
+        risk_card.pack(fill="x", padx=5, pady=5)
+
+        risk_top = ctk.CTkFrame(risk_card, fg_color="transparent")
+        risk_top.pack(fill="x", padx=12, pady=(8, 2))
+
+        ctk.CTkLabel(
+            risk_top,
+            text=f"🛡️ Skor Risiko Privasi: {risk_score}%",
+            font=ctk.CTkFont(size=13, weight="bold")
+        ).pack(side="left")
+
+        ctk.CTkLabel(
+            risk_top,
+            text=f"[{risk_level}]",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            text_color=risk_color
+        ).pack(side="left", padx=8)
+
+        risk_bar = ctk.CTkProgressBar(risk_card, height=7, corner_radius=4)
+        risk_bar.pack(fill="x", padx=12, pady=4)
+        risk_bar.set(risk_score / 100.0)
+        risk_bar.configure(progress_color=risk_color)
+
+        if risk_reasons:
+            for r in risk_reasons:
+                ctk.CTkLabel(
+                    risk_card,
+                    text=f"• {r}",
+                    font=ctk.CTkFont(size=10),
+                    text_color="#cfd8dc"
+                ).pack(anchor="w", padx=16, pady=1)
+
+        ctk.CTkLabel(
+            risk_card,
+            text=f"💡 Rekomendasi: {risk_rec}",
+            font=ctk.CTkFont(size=10, slant="italic"),
+            text_color="#90a4ae"
+        ).pack(anchor="w", padx=12, pady=(4, 8))
+
         # AI Watermark Alert Box if present
         if item.get("has_ai_watermark"):
             wm_box = ctk.CTkFrame(self.detail_scroll, corner_radius=8, fg_color="#3e1b4a")
@@ -556,6 +657,48 @@ class MetaCleanApp(ctk.CTk):
                     font=ctk.CTkFont(size=11),
                     text_color="#f8bbd0"
                 ).pack(anchor="w", padx=20, pady=1)
+
+        # AI Forensics & Prompt Details Card
+        ai_f = item.get("ai_forensics") or {}
+        if ai_f.get("is_ai_generated") or ai_f.get("prompt"):
+            ai_card = ctk.CTkFrame(self.detail_scroll, corner_radius=8, fg_color="#261230")
+            ai_card.pack(fill="x", padx=5, pady=5)
+
+            ctk.CTkLabel(
+                ai_card,
+                text="🎨 Deteksi AI Generatif & Prompt Asli",
+                font=ctk.CTkFont(size=13, weight="bold"),
+                text_color="#f48fb1"
+            ).pack(anchor="w", padx=12, pady=(8, 2))
+
+            if ai_f.get("generator"):
+                ctk.CTkLabel(
+                    ai_card,
+                    text=f"Model: {ai_f.get('generator')}",
+                    font=ctk.CTkFont(size=11, weight="bold"),
+                    text_color="#ce93d8"
+                ).pack(anchor="w", padx=14, pady=1)
+
+            if ai_f.get("prompt"):
+                ctk.CTkLabel(
+                    ai_card,
+                    text=f'Prompt: "{ai_f.get("prompt")}"',
+                    font=ctk.CTkFont(size=10, slant="italic"),
+                    text_color="#fce4ec",
+                    wraplength=430,
+                    justify="left"
+                ).pack(anchor="w", padx=14, pady=3)
+
+            btn_clean_c2pa = ctk.CTkButton(
+                ai_card,
+                text="🤖 Hapus Jejak AI & Manifes C2PA",
+                height=26,
+                fg_color="#8e24aa",
+                hover_color="#6a1b9a",
+                font=ctk.CTkFont(size=11, weight="bold"),
+                command=lambda p=item.get("file_path"): self._clean_ai_and_c2pa_action(p)
+            )
+            btn_clean_c2pa.pack(anchor="w", padx=12, pady=(4, 8))
 
         # Categories & Tag Details
         categories = item.get("categories", {})
@@ -928,6 +1071,195 @@ class MetaCleanApp(ctk.CTk):
                 messagebox.showinfo("Berhasil", f"Laporan Markdown berhasil disimpan ke:\n{save_path}")
             else:
                 messagebox.showerror("Gagal", "Gagal menyimpan berkas laporan Markdown.")
+
+    def _update_shell_button_text(self):
+        if not hasattr(self, 'btn_shell'):
+            return
+        if WindowsShellIntegration.is_installed():
+            self.btn_shell.configure(text="✓ Menu Explorer Aktif", fg_color="#15803d", hover_color="#166534")
+        else:
+            self.btn_shell.configure(text="⚙️ Menu Klik Kanan", fg_color="#334155", hover_color="#1e293b")
+
+    def _toggle_shell_integration(self):
+        if WindowsShellIntegration.is_installed():
+            confirm = messagebox.askyesno(
+                "Konfirmasi Pencopotan",
+                "Menu klik kanan Mrclean saat ini sedang aktif di Windows Explorer.\n\nApakah Anda ingin mencopotnya dari menu klik kanan?"
+            )
+            if confirm:
+                ok, msg = WindowsShellIntegration.uninstall()
+                if ok:
+                    messagebox.showinfo("Berhasil", msg)
+                else:
+                    messagebox.showerror("Gagal", msg)
+                self._update_shell_button_text()
+        else:
+            confirm = messagebox.askyesno(
+                "Integrasi Windows Explorer",
+                "Tambahkan pintasan 'Bersihkan Metadata dengan Mrclean' ke menu klik kanan Windows Explorer?\n\n(Beroperasi 100% aman di akun pengguna saat ini / HKCU tanpa butuh hak Administrator)."
+            )
+            if confirm:
+                ok, msg = WindowsShellIntegration.install()
+                if ok:
+                    messagebox.showinfo("Berhasil", msg)
+                else:
+                    messagebox.showerror("Gagal", msg)
+                self._update_shell_button_text()
+
+    def _apply_preset_action(self, choice):
+        if choice == "⚡ Profil Cepat...":
+            return
+
+        target_paths = list(self.selected_file_paths)
+        if not target_paths and self.selected_item:
+            sel_p = self.selected_item.get("file_path")
+            if sel_p:
+                target_paths = [sel_p]
+
+        if not target_paths:
+            messagebox.showinfo("Petunjuk", "Silakan centang atau pilih berkas di daftar sebelum menerapkan profil cepat.")
+            self.preset_var.set("⚡ Profil Cepat...")
+            return
+
+        preset_map = {
+            "📱 Media Sosial": "social_media",
+            "🎓 Akademik": "academic",
+            "💻 Developer/OSS": "developer"
+        }
+        preset_key = preset_map.get(choice, "social_media")
+        inplace = bool(self.chk_inplace.get())
+        mode_str = "di tempat (In-Place)" if inplace else "sebagai salinan baru"
+
+        confirm = messagebox.askyesno(
+            "Terapkan Profil Pembersihan",
+            f"Terapkan profil '{choice}' pada {len(target_paths)} berkas terpilih?\n\nMode: Pembersihan {mode_str}."
+        )
+        if not confirm:
+            self.preset_var.set("⚡ Profil Cepat...")
+            return
+
+        self.status_bar.configure(text=f"Sedang menerapkan profil {choice} pada {len(target_paths)} berkas...")
+
+        def worker():
+            success_count = 0
+            new_items = []
+            for path in target_paths:
+                res = PresetCleaner.clean_with_preset(path, preset_key=preset_key, inplace=inplace)
+                if res.get("success"):
+                    success_count += 1
+                    target_p = path if inplace else res.get("output_path", path)
+                    cleaned_info = inspect_file(target_p)
+                    if inplace:
+                        for idx, it in enumerate(self.scanned_items):
+                            if it.get("file_path") == path:
+                                self.scanned_items[idx] = cleaned_info
+                                break
+                    else:
+                        new_items.append(cleaned_info)
+
+            def on_finish():
+                if not inplace:
+                    self.scanned_items.extend(new_items)
+                self._refresh_file_list()
+                if self.selected_item:
+                    sel_p = self.selected_item.get("file_path")
+                    for it in self.scanned_items:
+                        if it.get("file_path") == sel_p:
+                            self._display_detail(it)
+                            break
+                self.preset_var.set("⚡ Profil Cepat...")
+                self.status_bar.configure(text=f"Profil {choice} selesai diterapkan pada {success_count} dari {len(target_paths)} berkas.")
+                messagebox.showinfo(
+                    "Selesai",
+                    f"Profil {choice} berhasil diterapkan pada {success_count} dari {len(target_paths)} berkas {mode_str}!"
+                )
+
+            self.after(0, on_finish)
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def _spoof_metadata_action(self):
+        target_paths = list(self.selected_file_paths)
+        if not target_paths and self.selected_item:
+            sel_p = self.selected_item.get("file_path")
+            if sel_p:
+                target_paths = [sel_p]
+
+        if not target_paths:
+            messagebox.showinfo("Petunjuk", "Silakan centang atau pilih berkas di daftar untuk disamarkan metadatanya.")
+            return
+
+        inplace = bool(self.chk_inplace.get())
+        mode_str = "di tempat (In-Place)" if inplace else "sebagai salinan baru"
+
+        confirm = messagebox.askyesno(
+            "Konfirmasi Samarkan Metadata (Spoofing)",
+            f"Apakah Anda ingin menyamarkan metadata {len(target_paths)} berkas dengan metadata kamera sintetis yang wajar (Canon/Nikon/Sony acak)?\n\nMode: Pemrosesan {mode_str}."
+        )
+        if not confirm:
+            return
+
+        self.status_bar.configure(text=f"Sedang menyamarkan metadata {len(target_paths)} berkas...")
+
+        def worker():
+            success_count = 0
+            new_items = []
+            for path in target_paths:
+                res = MetadataSpoofer.spoof(path, profile_name="random", inplace=inplace)
+                if res.get("success"):
+                    success_count += 1
+                    target_p = path if inplace else res.get("output_path", path)
+                    spoofed_info = inspect_file(target_p)
+                    if inplace:
+                        for idx, it in enumerate(self.scanned_items):
+                            if it.get("file_path") == path:
+                                self.scanned_items[idx] = spoofed_info
+                                break
+                    else:
+                        new_items.append(spoofed_info)
+
+            def on_finish():
+                if not inplace:
+                    self.scanned_items.extend(new_items)
+                self._refresh_file_list()
+                if self.selected_item:
+                    sel_p = self.selected_item.get("file_path")
+                    for it in self.scanned_items:
+                        if it.get("file_path") == sel_p:
+                            self._display_detail(it)
+                            break
+                self.status_bar.configure(text=f"Penyuntikan metadata sintetis selesai pada {success_count} dari {len(target_paths)} berkas.")
+                messagebox.showinfo(
+                    "Berhasil",
+                    f"Metadata sintetis berhasil disuntikkan ke {success_count} dari {len(target_paths)} berkas {mode_str}!"
+                )
+
+            self.after(0, on_finish)
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def _clean_ai_and_c2pa_action(self, file_path):
+        if not file_path or not os.path.exists(file_path):
+            messagebox.showerror("Error", "Berkas tidak ditemukan.")
+            return
+
+        inplace = bool(self.chk_inplace.get())
+        res = C2PACleaner.clean_ai_and_c2pa(file_path, inplace=inplace)
+        if res.get("success"):
+            target_p = file_path if inplace else res.get("output_path")
+            new_info = inspect_file(target_p)
+            if inplace:
+                for idx, it in enumerate(self.scanned_items):
+                    if it.get("file_path") == file_path:
+                        self.scanned_items[idx] = new_info
+                        break
+            else:
+                self.scanned_items.append(new_info)
+            self._refresh_file_list()
+            self._display_detail(new_info)
+            messagebox.showinfo("Berhasil", "Jejak AI generatif dan manifes C2PA berhasil dibersihkan!")
+        else:
+            messagebox.showerror("Gagal", res.get("error", "Gagal membersihkan jejak AI."))
 
 def main():
     app = MetaCleanApp()
