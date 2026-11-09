@@ -244,4 +244,51 @@ Berdasarkan investigasi standar industri (C2PA, DeepMind SynthID, OpenAI, Midjou
 - [x] Verifikasi 27 Kasus Uji Otomatis: **100% PASS (0 GAGAL / 0 ERROR)**
 - [x] Re-Packaging Executable: Berhasil dikompilasi ke `dist/Mrclean.exe` & `Mrclean.exe` (42.00 MB)
 
+---
+
+## 9. Rencana Implementasi Branch `fix/select-item` (Fitur Pemilihan Multi-Berkas)
+
+> **STATUS:** DRAFT UNTUK DITINJAU & DISETUJUI  
+> **PROYEK:** Mrclean (MCleanPro)  
+> **PEMILIK PROYEK:** Yogi Ario  
+> **BRANCH:** `fix/select-item`  
+> **TANGGAL:** 9 November 2026  
+> **TIGA PRINSIP UTAMA:**  
+> 1. *No Plan, No Code.*  
+> 2. *No Approval, No Code.*  
+> 3. *No Evidence, No Completion.*  
+
+### 9.1 Masalah & Kebutuhan
+Saat ini pengguna hanya dapat memilih satu per satu berkas (*single select*) untuk dibersihkan, atau harus langsung membersihkan seluruh isi folder sekaligus (*all items*). Pengguna membutuhkan fleksibilitas untuk **mencentang beberapa berkas tertentu saja** (misal 3 dari 10 berkas) untuk diproses secara bersamaan.
+
+### 9.2 Rancangan Solusi & Antarmuka (UI/UX)
+1. **Master Control "Pilih Semua" (Select All Header):**
+   - Pada header panel daftar berkas sebelah kiri, ditambahkan kontrol:
+     - Checkbox Master: `[ ] Pilih Semua` yang otomatis mencentang atau membatalkan centang pada seluruh berkas di daftar.
+     - Label indikator jumlah: `(X dari Y berkas dipilih)`.
+2. **Checkbox per Baris Berkas (Row Checkboxes):**
+   - Menambahkan komponen `ctk.CTkCheckBox` di setiap baris berkas di panel kiri.
+   - Mengklik nama berkas tetap membuka pratinjau detail di panel kanan.
+   - State berkas terpilih disimpan dalam himpunan `self.selected_file_paths = set()`.
+3. **Eksekusi Aksi Pembersihan Multi-Berkas:**
+   - Tombol **"🛡️ Bersihkan Berkas Terpilih"**:
+     - Jika ada beberapa berkas yang dicentang, tombol akan membersihkan seluruh berkas terpilih tersebut dalam alur kerja batch berlatar belakang (*threading*).
+     - Menampilkan konfirmasi dan laporan keberhasilan: *"X berkas berhasil dibersihkan."*
+   - Tombol **"🤖 Hapus Watermark AI Saja"**:
+     - Mendukung pembersihan tanda air pada seluruh berkas yang dicentang.
+   - **Mekanisme Fallback:** Jika tidak ada checkbox yang dicentang namun ada satu berkas yang sedang aktif dilihat di panel detail, aksi otomatis berlaku pada berkas aktif tersebut.
+
+### 9.3 Daftar Berkas yang Terlibat
+- `src/gui/app.py` — Implementasi state selection, checkbox per baris, select-all control, dan modifikasi handler pembersihan.
+- `tests/test_multi_select.py` — Pengujian unit logika batch pembersihan untuk daftar berkas terpilih.
+- `Docs/Task_Status.md` & `Docs/Decision_Log.md` — Pembaruan status tugas dan pencatatan ADR.
+
+### 9.4 Rencana Pengujian (100% PASS Gate)
+- Menjalankan seluruh test suite yang ada (27 tests) ditambah kasus uji baru untuk memastikan tidak ada regresi dan hasil pengujian **100% PASS (0 GAGAL / 0 ERROR)**.
+
+### 9.5 Gerbang Persetujuan (Approval Gate)
+- [ ] Rencana Fitur Pemilihan Multi-Berkas Disetujui Mas Yogi Ario
+- [ ] Izin Eksekusi Pengkodean pada Branch `fix/select-item` Diberikan Mas Yogi Ario
+
+
 
