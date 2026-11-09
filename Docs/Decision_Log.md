@@ -17,6 +17,12 @@
 | **ADR-005** | 31/10/2026 | Branding Baru & Dukungan File Coding | Menggunakan `Material/logo.jpg` & Menambahkan `TextCleaner` untuk Markdown dan Seluruh Bahasa Pemrograman | `[APPROVED]` |
 | **ADR-006** | 31/10/2026 | Ekspor PDF/MD & Editor Metadata Selektif | Modal Radio Button Ekspor (PDF/Markdown) & Engine Edit Metadata Parsial Preservative | `[APPROVED]` |
 | **ADR-007** | 09/11/2026 | Multi-Item Selection & Batch Cleaning Selektif | Checkbox baris antrean, Master Checkbox 'Pilih Semua', dan Dynamic Counter aksi | `[APPROVED]` |
+| **ADR-008** | 09/11/2026 | Privacy Risk Scoring Engine (0-100%) | Penilaian skor ancaman privasi berkas berbasis sensitivitas data (GPS, Serial, Author) | `[APPROVED]` |
+| **ADR-009** | 09/11/2026 | Quick Clean Presets (Profil Cepat) | Profil pembersihan sekali klik: Media Sosial, Akademik, dan Developer/OSS | `[APPROVED]` |
+| **ADR-010** | 09/11/2026 | AI Generative Forensics & C2PA Cleaner | Detektor prompt Midjourney/SD/DALL-E dan pembersih manifes C2PA Adobe | `[APPROVED]` |
+| **ADR-011** | 09/11/2026 | Metadata Spoofing & Anonymizer | Injeksi profil kamera sintetis realistis (Canon, Nikon, Sony) untuk kamuflase | `[APPROVED]` |
+| **ADR-012** | 09/11/2026 | Integrasi Menu Klik Kanan Windows Explorer | Pendaftaran shortcut shell di level HKCU tanpa memerlukan hak Administrator | `[APPROVED]` |
+| **ADR-013** | 09/11/2026 | Kebijakan Kebersihan Branch `main` | Branch main diisolasi khusus untuk kode produksi; catatan pengembang di-prune | `[APPROVED]` |
 
 ---
 
@@ -50,32 +56,52 @@
 - **Tanggal Usulan:** 31/10/2026
 - **Pengusul:** Yogi Ario & AI Agent
 - **Penyetuju Resmi:** Yogi Ario (31/10/2026)
-- **Konteks:** Mas Yogi menginstruksikan logo aplikasi diganti dengan `Material/logo.jpg` dan ditemukan kebutuhan pembersihan metadata/steganografi pada berkas Markdown (`.md`) serta berkas kode pemrograman (`.html`, `.js`, `.py`, `.php`, dll.).
-- **Keputusan:**
-  1. Menggunakan `Material/logo.jpg` sebagai sumber utama ikon Windows `assets/icon.ico` dan menampilkan `assets/logo.png` pada header GUI aplikasi.
-  2. Mengimplementasikan `TextCleaner` yang mencakup pembersihan steganografi AI (`\uFE0F`, zero-width spaces, joiners) pada file Markdown dan seluruh format coding, serta mendaftarkannya ke dispatcher utama `clean_file()`.
-- **Dampak:** Seluruh berkas teks dan koding dapat dibersihkan sekali klik baik secara per-file maupun batch satu folder.
+- **Keputusan:** Menggunakan `Material/logo.jpg` sebagai sumber utama ikon Windows `assets/icon.ico` dan menambahkan `TextCleaner` untuk format koding dan Markdown.
 
 ### ADR-006 — Dialog Ekspor Radio Button (PDF/Markdown) & Editor Metadata Preservative
 - **Status:** `[APPROVED]`
 - **Tanggal Usulan:** 31/10/2026
-- **Pengusul:** Yogi Ario (Project Owner)
 - **Penyetuju Resmi:** Yogi Ario (31/10/2026)
-- **Konteks:** Pengguna membutuhkan fleksibilitas saat mengekspor laporan (antara format PDF siap cetak berlogo vs format Markdown terstruktur untuk catatan/repo) melalui modal radio button, serta fitur penyuntingan atribut metadata tertentu (seperti mengganti Author saja) tanpa merusak atau mengubah metadata lain.
-- **Keputusan:**
-  1. Menyediakan `ExportFormatDialog` dengan pilihan radio button: `Dokumen PDF (.pdf)` via engine `PDFExporter` (`reportlab`) dan `Berkas Markdown (.md)` via `MarkdownExporter`.
-  2. Mengembangkan modul `src/editors/` (`ImageEditor`, `PdfEditor`, `DocxEditor`, `MediaEditor`) dan UI modal `MetadataEditDialog` yang menyuntikkan perubahan field selektif secara langsung (*In-Place*) atau sebagai salinan, dengan mempertahankan 100% tag metadata lainnya.
-- **Dampak:** Pengguna dapat mengganti Author dokumen/gambar tanpa merusak riwayat kamera/resolusi, serta bebas memilih format laporan analisis sesuai kebutuhan.
+- **Keputusan:** Menyediakan `ExportFormatDialog` (PDF & Markdown) dan modul `src/editors/` untuk pengubahan metadata selektif.
 
 ### ADR-007 — Multi-Item Selection & Batch Cleaning Selektif
 - **Status:** `[APPROVED]`
 - **Tanggal Usulan:** 09/11/2026
-- **Pengusul:** Yogi Ario (Project Owner)
-- **Penyetuju Resmi:** Yogi Ario (09/11/2026 via approval plan)
-- **Konteks:** Sebelumnya, pengguna hanya dapat membersihkan satu berkas aktif atau membersihkan seluruh antrean sekaligus. Pengguna membutuhkan fleksibilitas untuk memilih (centang) beberapa berkas tertentu dalam antrean (misal 3 dari 10 berkas) dan membersihkannya secara bersamaan.
-- **Keputusan:**
-  1. Menambahkan `CTkCheckBox` pada setiap baris item berkas di panel kiri GUI yang tersinkronisasi dengan state himpunan `self.selected_file_paths`.
-  2. Menambahkan Master Checkbox `[ ] Pilih Semua` pada header antrean berkas untuk toggle seleksi massal.
-  3. Menampilkan label status dinamis `(X dari Y terpilih)` serta memperbarui teks tombol aksi secara langsung: `🛡️ Bersihkan Berkas Terpilih (N)` dan `🤖 Hapus Watermark AI Saja (N)`.
-  4. Bila tidak ada checkbox yang dicentang, tombol aksi tetap mempertahankan perilaku pemilihan fallback pada baris berkas yang sedang aktif/disorot.
-- **Dampak:** Alur kerja pengguna menjadi jauh lebih fleksibel, cepat, dan intuitif dalam memilih subset berkas untuk pembersihan metadata atau watermark AI.
+- **Penyetuju Resmi:** Yogi Ario (09/11/2026)
+- **Keputusan:** Menambahkan checkbox per baris dan Master Checkbox 'Pilih Semua' serta counter dinamis untuk pembersihan batch selektif.
+
+### ADR-008 — Privacy Risk Scoring Engine (0-100%)
+- **Status:** `[APPROVED]`
+- **Tanggal Usulan:** 09/11/2026
+- **Penyetuju Resmi:** Yogi Ario (09/11/2026)
+- **Keputusan:** Mengembangkan `src/inspectors/risk_scorer.py` untuk mengukur tingkat kerentanan privasi berkas ke dalam tingkatan Kritis (≥70%), Sedang (30-69%), dan Aman (<30%) dengan representasi meter visual di GUI dan laporan ekspor.
+
+### ADR-009 — Quick Clean Presets (Profil Cepat)
+- **Status:** `[APPROVED]`
+- **Tanggal Usulan:** 09/11/2026
+- **Penyetuju Resmi:** Yogi Ario (09/11/2026)
+- **Keputusan:** Mengembangkan `src/cleaners/preset_cleaner.py` dengan profil Media Sosial, Akademik, dan Developer/OSS untuk pembersihan instan berbasis skenario.
+
+### ADR-010 — AI Generative Forensics & C2PA Cleaner
+- **Status:** `[APPROVED]`
+- **Tanggal Usulan:** 09/11/2026
+- **Penyetuju Resmi:** Yogi Ario (09/11/2026)
+- **Keputusan:** Mengembangkan `src/inspectors/ai_forensics.py` dan `src/cleaners/c2pa_cleaner.py` untuk mengekstrak prompt asli (Stable Diffusion, Midjourney, DALL-E) dan menghapus manifes C2PA Adobe.
+
+### ADR-011 — Metadata Spoofing & Anonymizer
+- **Status:** `[APPROVED]`
+- **Tanggal Usulan:** 09/11/2026
+- **Penyetuju Resmi:** Yogi Ario (09/11/2026)
+- **Keputusan:** Mengembangkan `src/editors/spoofing.py` untuk menginjeksi metadata kamera sintetis acak dan wajar agar berkas tidak terdeteksi sebagai berkas yang metadatanya sengaja dihapus (*anti-stripper detection*).
+
+### ADR-012 — Integrasi Menu Klik Kanan Windows Explorer
+- **Status:** `[APPROVED]`
+- **Tanggal Usulan:** 09/11/2026
+- **Penyetuju Resmi:** Yogi Ario (09/11/2026)
+- **Keputusan:** Mengembangkan `src/utils/shell_integration.py` untuk mendaftarkan pintasan klik kanan di `HKEY_CURRENT_USER` tanpa butuh akses Administrator.
+
+### ADR-013 — Kebijakan Kebersihan Branch `main`
+- **Status:** `[APPROVED]`
+- **Tanggal Usulan:** 09/11/2026
+- **Penyetuju Resmi:** Yogi Ario (09/11/2026)
+- **Keputusan:** Mengisolasi branch `main` khusus untuk berkas produksi bersih melalui skrip otomatis `tools/sync_to_main.py` yang memangkas folder catatan pengembang (`Docs/`, `changelog/`, dll.).
