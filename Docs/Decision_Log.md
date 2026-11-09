@@ -9,13 +9,14 @@
 ## 📑 Indeks Rekaman Keputusan
 
 | ID Keputusan | Tanggal | Topik / Fitur | Keputusan Singkat | Status |
-| :---: | :---: | :--- | :--- | :---: |
+| :---: | :---: | :--- | :--- | :--- |
 | **ADR-001** | 31/10/2026 | Pemilihan Framework GUI & Runtime | Menggunakan Python 3.13 Desktop dengan CustomTkinter | `[APPROVED]` |
 | **ADR-002** | 31/10/2026 | Lingkungan Eksekusi & Privasi | Beroperasi 100% Offline (Tanpa Jaringan / API Eksternal) | `[APPROVED]` |
 | **ADR-003** | 31/10/2026 | Integrasi AI Watermark Remover | Mengadopsi modul dari `guillaumemeyer/watermarks-remover` | `[APPROVED]` |
 | **ADR-004** | 31/10/2026 | Packaging & Branding | Membangun Standalone `.exe` dengan Ikon Kustom `img.png` | `[SUPERSEDED]` |
 | **ADR-005** | 31/10/2026 | Branding Baru & Dukungan File Coding | Menggunakan `Material/logo.jpg` & Menambahkan `TextCleaner` untuk Markdown dan Seluruh Bahasa Pemrograman | `[APPROVED]` |
 | **ADR-006** | 31/10/2026 | Ekspor PDF/MD & Editor Metadata Selektif | Modal Radio Button Ekspor (PDF/Markdown) & Engine Edit Metadata Parsial Preservative | `[APPROVED]` |
+| **ADR-007** | 09/11/2026 | Multi-Item Selection & Batch Cleaning Selektif | Checkbox baris antrean, Master Checkbox 'Pilih Semua', dan Dynamic Counter aksi | `[APPROVED]` |
 
 ---
 
@@ -65,3 +66,16 @@
   1. Menyediakan `ExportFormatDialog` dengan pilihan radio button: `Dokumen PDF (.pdf)` via engine `PDFExporter` (`reportlab`) dan `Berkas Markdown (.md)` via `MarkdownExporter`.
   2. Mengembangkan modul `src/editors/` (`ImageEditor`, `PdfEditor`, `DocxEditor`, `MediaEditor`) dan UI modal `MetadataEditDialog` yang menyuntikkan perubahan field selektif secara langsung (*In-Place*) atau sebagai salinan, dengan mempertahankan 100% tag metadata lainnya.
 - **Dampak:** Pengguna dapat mengganti Author dokumen/gambar tanpa merusak riwayat kamera/resolusi, serta bebas memilih format laporan analisis sesuai kebutuhan.
+
+### ADR-007 — Multi-Item Selection & Batch Cleaning Selektif
+- **Status:** `[APPROVED]`
+- **Tanggal Usulan:** 09/11/2026
+- **Pengusul:** Yogi Ario (Project Owner)
+- **Penyetuju Resmi:** Yogi Ario (09/11/2026 via approval plan)
+- **Konteks:** Sebelumnya, pengguna hanya dapat membersihkan satu berkas aktif atau membersihkan seluruh antrean sekaligus. Pengguna membutuhkan fleksibilitas untuk memilih (centang) beberapa berkas tertentu dalam antrean (misal 3 dari 10 berkas) dan membersihkannya secara bersamaan.
+- **Keputusan:**
+  1. Menambahkan `CTkCheckBox` pada setiap baris item berkas di panel kiri GUI yang tersinkronisasi dengan state himpunan `self.selected_file_paths`.
+  2. Menambahkan Master Checkbox `[ ] Pilih Semua` pada header antrean berkas untuk toggle seleksi massal.
+  3. Menampilkan label status dinamis `(X dari Y terpilih)` serta memperbarui teks tombol aksi secara langsung: `🛡️ Bersihkan Berkas Terpilih (N)` dan `🤖 Hapus Watermark AI Saja (N)`.
+  4. Bila tidak ada checkbox yang dicentang, tombol aksi tetap mempertahankan perilaku pemilihan fallback pada baris berkas yang sedang aktif/disorot.
+- **Dampak:** Alur kerja pengguna menjadi jauh lebih fleksibel, cepat, dan intuitif dalam memilih subset berkas untuk pembersihan metadata atau watermark AI.
